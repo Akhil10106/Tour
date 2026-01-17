@@ -46,17 +46,6 @@
         .dest-highlight { color: var(--lavender); font-weight: 700; border-bottom: 2px dashed var(--lavender); }
         #instructionLabel { color: var(--rose-gold); font-weight: 700; min-height: 40px; margin-top: 10px; }
 
-        /* --- COUNTDOWN BOXES --- */
-        .countdown-container {
-            display: flex; justify-content: center; gap: 12px; margin-top: 25px;
-        }
-        .time-box {
-            background: rgba(142, 68, 173, 0.05); padding: 12px; border-radius: 15px;
-            min-width: 70px; border: 1px solid rgba(142, 68, 173, 0.1);
-        }
-        .time-val { font-size: 1.5rem; font-weight: 700; color: var(--lavender); display: block; }
-        .time-label { font-size: 0.65rem; text-transform: uppercase; color: #777; letter-spacing: 1px; }
-
         /* --- BUTTONS --- */
         .btn-yes {
             background: linear-gradient(45deg, var(--lavender), var(--rose-gold));
@@ -84,6 +73,17 @@
             justify-content: center; font-size: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
             border: none; z-index: 6000; color: var(--lavender);
         }
+
+        /* --- COUNTDOWN BOXES --- */
+        .countdown-container {
+            display: flex; justify-content: center; gap: 12px; margin-top: 25px;
+        }
+        .time-box {
+            background: rgba(142, 68, 173, 0.05); padding: 12px; border-radius: 15px;
+            min-width: 70px; border: 1px solid rgba(142, 68, 173, 0.1);
+        }
+        .time-val { font-size: 1.5rem; font-weight: 700; color: var(--lavender); display: block; }
+        .time-label { font-size: 0.65rem; text-transform: uppercase; color: #777; letter-spacing: 1px; }
     </style>
 </head>
 <body>
@@ -132,7 +132,7 @@
             <div id="successContent" style="display:none;" class="animate__animated animate__fadeIn">
                 <div class="display-1 mb-3">🕺</div>
                 <h1 class="main-title" style="color: var(--lavender);">Pack your bags!</h1>
-                <h4 class="fw-bold mt-2">Thats like a good Son</h4>
+                <h4 class="fw-bold mt-2">Thats like a good Son <span id="loggedInUserName"></span></h4>
                 
                 <div class="countdown-container">
                     <div class="time-box"><span class="time-val" id="days">00</span><span class="time-label">Days</span></div>
@@ -166,6 +166,7 @@
         const db = firebase.firestore();
         const AKHIL_EMAIL = "akhilgoel985@gmail.com";
         let targetDate;
+        let userDisplayName = "";
 
         function toggleSidebar() { document.getElementById('adminSidebar').classList.toggle('active'); }
 
@@ -185,6 +186,7 @@
         document.getElementById('loginBtn').onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
         auth.onAuthStateChanged(user => {
             if (user) {
+                userDisplayName = user.displayName;
                 document.getElementById('authScreen').style.display = 'none';
                 document.getElementById('appUI').style.display = 'flex';
                 if (user.email === AKHIL_EMAIL) document.getElementById('gearBtn').style.display = 'flex';
@@ -239,6 +241,7 @@
             } else {
                 document.getElementById('proposalContent').style.display = 'none';
                 document.getElementById('successContent').style.display = 'block';
+                document.getElementById('loggedInUserName').innerText = userDisplayName || "";
                 confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
                 startCountdown();
             }
