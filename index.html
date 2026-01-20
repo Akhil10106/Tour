@@ -2,299 +2,1646 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Trip Status | Akhil's Masterpiece</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>TripSplit | Premium Group Expense Cloud</title>
     
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@700&family=Quicksand:wght@300;500;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="TripSplit">
+    <meta name="description" content="Elite expense tracking and trip management for professional travelers.">
+    <meta name="theme-color" content="#6366f1">
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/2534/2534183.png">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@200;300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        brand: {
+                            50: '#eef2ff', 100: '#e0e7ff', 200: '#c7d2fe', 300: '#a5b4fc',
+                            400: '#818cf8', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca',
+                            800: '#3730a3', 900: '#312e81', 950: '#1e1b4b',
+                        },
+                        accent: '#f43f5e',
+                        success: '#10b981',
+                        warning: '#f59e0b',
+                        glass: 'rgba(255, 255, 255, 0.7)',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        mono: ['JetBrains Mono', 'monospace'],
+                    },
+                    animation: {
+                        'float': 'float 6s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                        'spin-slow': 'spin 8s linear infinite',
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-20px)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
 
     <style>
         :root {
-            --lavender: #8e44ad;
-            --rose-gold: #ff758c;
-            --glass: rgba(255, 255, 255, 0.96);
+            --glass-bg: rgba(255, 255, 255, 0.8);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --primary-gradient: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+            --mesh-bg: radial-gradient(at 0% 0%, hsla(253,16%,7%,1) 0, transparent 50%), 
+                      radial-gradient(at 50% 0%, hsla(225,39%,30%,1) 0, transparent 50%), 
+                      radial-gradient(at 100% 0%, hsla(339,49%,30%,1) 0, transparent 50%);
         }
 
-        body {
-            margin: 0; min-height: 100vh; font-family: 'Quicksand', sans-serif;
-            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
-            overflow: hidden; display: flex; align-items: center; justify-content: center;
-            user-select: none;
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+
+        .glass-premium {
+            background: var(--glass-bg);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
         }
 
-        /* --- MAGIC CLICK PARTICLES --- */
-        .click-heart {
-            position: fixed; pointer-events: none; z-index: 10000;
-            animation: heartFadeUp 1.5s ease-out forwards; font-size: 24px;
-        }
-        @keyframes heartFadeUp {
-            0% { transform: translateY(0) scale(0.5) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(-150px) scale(1.5) rotate(45deg); opacity: 0; }
+        .mesh-gradient { background: var(--mesh-bg); }
+
+        .btn-premium {
+            background: var(--primary-gradient);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
         }
 
-        /* --- OPTIMIZED COMPACT CARD --- */
-        .proposal-card {
-            background: var(--glass); backdrop-filter: blur(50px); border-radius: 40px;
-            padding: 2.5rem 2rem; box-shadow: 0 40px 100px rgba(142, 68, 173, 0.15);
-            max-width: 600px; width: 92%; text-align: center; border: 1px solid white;
-            z-index: 10; position: relative; transition: all 0.4s ease;
+        .btn-premium::after {
+            content: ''; position: absolute; top: -50%; left: -50%; width: 200%; height: 200%;
+            background: rgba(255,255,255,0.1); transform: rotate(45deg); transition: 0.6s;
+            pointer-events: none; opacity: 0;
         }
 
-        .main-title { font-family: 'Dancing Script', cursive; font-size: 3rem; color: #2c3e50; line-height: 1.1; }
-        .dest-highlight { color: var(--lavender); font-weight: 700; border-bottom: 2px dashed var(--lavender); }
-        #instructionLabel { color: var(--rose-gold); font-weight: 700; min-height: 40px; margin-top: 10px; }
+        .btn-premium:hover::after { left: 100%; opacity: 1; }
+        .btn-premium:hover { transform: translateY(-2px); box-shadow: 0 15px 30px -5px rgba(99, 102, 241, 0.4); }
 
-        /* --- BUTTONS --- */
-        .btn-yes {
-            background: linear-gradient(45deg, var(--lavender), var(--rose-gold));
-            color: white !important; border: none; border-radius: 100px; padding: 15px 50px;
-            font-weight: 700; font-size: 1.1rem; transition: transform 0.3s ease;
-            box-shadow: 0 10px 25px rgba(142, 68, 173, 0.2); z-index: 20;
-        }
-        .btn-no {
-            border-radius: 100px; padding: 12px 40px; font-weight: 600;
-            border: 2px solid #ddd; background: #fff; color: #888;
-            z-index: 15; cursor: default;
+        .view-pane { display: none; opacity: 0; transform: translateY(20px); transition: all 0.5s ease-out; }
+        .view-pane.active { display: block; opacity: 1; transform: translateY(0); }
+
+        .card-premium {
+            background: #ffffff;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05), 0 2px 4px -1px rgba(0, 0, 0, 0.03);
+            border-radius: 1.5rem;
+            transition: all 0.3s ease;
         }
 
-        /* --- SIDEBAR --- */
-        #adminSidebar {
-            position: fixed; right: -400px; top: 0; width: 340px; height: 100vh;
-            background: white; z-index: 5000; transition: 0.5s cubic-bezier(0.16, 1, 0.3, 1);
-            padding: 2rem; box-shadow: -15px 0 50px rgba(0,0,0,0.08); overflow-y: auto;
-        }
-        #adminSidebar.active { right: 0; }
-
-        .gear-btn {
-            position: fixed; bottom: 25px; right: 25px; width: 55px; height: 55px;
-            background: white; border-radius: 50%; display: none; align-items: center;
-            justify-content: center; font-size: 1.5rem; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            border: none; z-index: 6000; color: var(--lavender);
+        .card-premium:hover {
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            transform: translateY(-2px);
         }
 
-        /* --- COUNTDOWN BOXES --- */
-        .countdown-container {
-            display: flex; justify-content: center; gap: 12px; margin-top: 25px;
+        .nav-item { position: relative; transition: color 0.3s; }
+        .nav-item::after {
+            content: ''; position: absolute; bottom: -4px; left: 0; width: 0; height: 2px;
+            background: #6366f1; transition: width 0.3s;
         }
-        .time-box {
-            background: rgba(142, 68, 173, 0.05); padding: 12px; border-radius: 15px;
-            min-width: 70px; border: 1px solid rgba(142, 68, 173, 0.1);
+        .nav-item.active::after { width: 100%; }
+
+        /* Skeleton Loaders */
+        .skeleton {
+            background: linear-gradient(90deg, #f1f5f9 25%, #e2e8f0 50%, #f1f5f9 75%);
+            background-size: 200% 100%;
+            animation: skeleton-loading 1.5s infinite;
         }
-        .time-val { font-size: 1.5rem; font-weight: 700; color: var(--lavender); display: block; }
-        .time-label { font-size: 0.65rem; text-transform: uppercase; color: #777; letter-spacing: 1px; }
+
+        @keyframes skeleton-loading {
+            0% { background-position: 200% 0; }
+            100% { background-position: -200% 0; }
+        }
+
+        /* Custom Checkbox Split */
+        .split-check:checked + label {
+            background-color: #6366f1;
+            color: white;
+            border-color: #6366f1;
+        }
+
+        .tab-active { color: #6366f1; border-bottom: 2px solid #6366f1; }
+        
+        #toast-wrapper { pointer-events: none; }
+        .toast { pointer-events: auto; animation: slideIn 0.4s ease forwards; }
+
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        /* Custom Radio for Categories */
+        .cat-radio:checked + label {
+            background-color: #f1f5f9;
+            border-color: #6366f1;
+            color: #6366f1;
+            transform: scale(1.05);
+        }
     </style>
 </head>
-<body>
+<body class="bg-[#fcfdfe] text-slate-900 overflow-x-hidden antialiased">
 
-    <div id="authScreen" class="animate__animated animate__fadeIn">
-        <div class="proposal-card">
-            <h1 class="main-title mb-4">Trip Dashboard</h1>
-            <p class="text-muted mb-4">Unlock to view destination details.</p>
-            <button id="loginBtn" class="btn btn-dark btn-lg rounded-pill px-5 shadow">Login with Google</button>
+    <div id="toast-wrapper" class="fixed top-6 right-6 z-[9999] flex flex-col gap-4 max-w-sm"></div>
+
+    <div id="global-loader" class="fixed inset-0 z-[10000] bg-white flex items-center justify-center transition-opacity duration-700">
+        <div class="flex flex-col items-center">
+            <div class="w-16 h-16 border-4 border-slate-100 border-t-brand-500 rounded-full animate-spin"></div>
+            <p class="mt-4 text-brand-600 font-bold tracking-widest uppercase text-xs">TripSplit Cloud</p>
         </div>
     </div>
 
-    <button id="gearBtn" class="gear-btn" onclick="toggleSidebar()"><i class="bi bi-gear-fill"></i></button>
-
-    <div id="adminSidebar">
-        <h5 class="fw-bold mb-4">Master Console</h5>
-        <div class="mb-3">
-            <label class="small fw-bold text-muted mb-1">FRIEND'S NAME</label>
-            <input type="text" id="nameInput" class="form-control rounded-pill bg-light border-0 px-3 py-2 shadow-none">
-        </div>
-        <div class="mb-3">
-            <label class="small fw-bold text-muted mb-1">DESTINATION</label>
-            <input type="text" id="tripInput" class="form-control rounded-pill bg-light border-0 px-3 py-2 shadow-none">
-        </div>
-        <div class="mb-4">
-            <label class="small fw-bold text-muted mb-1">DEPARTURE DATE</label>
-            <input type="datetime-local" id="dateInput" class="form-control rounded-pill bg-light border-0 px-3 py-2 shadow-none">
-        </div>
-        <button class="btn btn-primary w-100 rounded-pill py-3 shadow mb-2" id="saveBtn">Apply Updates ✨</button>
-        <button class="btn btn-outline-danger w-100 rounded-pill py-2" onclick="auth.signOut().then(()=>location.reload())">Logout</button>
-    </div>
-
-    <div id="appUI" style="display:none; width:100%; height:100%; align-items:center; justify-content:center;">
-        <div class="proposal-card animate__animated animate__zoomIn">
-            <div id="proposalContent">
-                <div id="emojiDisplay" class="display-1 mb-3">🏔️</div>
-                <h1 id="questionText" class="main-title">Heading to <span class="dest-highlight">Adventure</span></h1>
-                <p id="instructionLabel" class="animate__animated"></p>
+    <section id="auth-screen" class="fixed inset-0 z-[1000] bg-white overflow-hidden hidden">
+        <div class="mesh-gradient absolute inset-0 opacity-10"></div>
+        <div class="relative min-h-screen flex items-center justify-center p-6">
+            <div class="w-full max-w-lg text-center">
+                <div class="mb-8 relative inline-block">
+                    <div class="w-32 h-32 bg-brand-600 rounded-[2.5rem] shadow-2xl shadow-brand-200 mx-auto flex items-center justify-center transform rotate-12 transition-transform hover:rotate-0 duration-500">
+                        <i class="fa-solid fa-cloud-bolt text-white text-6xl"></i>
+                    </div>
+                    <div class="absolute -top-4 -right-4 w-12 h-12 bg-accent rounded-full border-4 border-white flex items-center justify-center text-white shadow-lg animate-bounce">
+                        <i class="fa-solid fa-plane text-xl"></i>
+                    </div>
+                </div>
                 
-                <div class="d-flex justify-content-center flex-column flex-sm-row gap-3 mt-4" style="min-height: 80px;">
-                    <button id="yesBtn" class="btn-yes shadow-lg">YES! 🎒</button>
-                    <button id="noBtn" class="btn-no shadow-sm">No 😢</button>
+                <h1 class="text-6xl font-extrabold tracking-tighter text-slate-900 mb-4">TripSplit</h1>
+                <p class="text-slate-500 text-lg font-medium mb-12">Seamless finance for modern adventurers.</p>
+                
+                <div id="login-form-container" class="space-y-6">
+                    <button id="google-login-trigger" class="w-full h-16 glass-premium rounded-2xl flex items-center justify-center gap-4 text-slate-700 font-bold text-lg hover:shadow-xl transition-all border-slate-200">
+                        <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="w-7 h-7" alt="Google">
+                        Sign in with Google Account
+                    </button>
+                    <div class="flex items-center gap-4 opacity-50">
+                        <hr class="flex-1 border-slate-200">
+                        <span class="text-xs uppercase font-black text-slate-400">Trusted by 1M+ Travelers</span>
+                        <hr class="flex-1 border-slate-200">
+                    </div>
+                </div>
+
+                <div id="discovery-module" class="hidden mt-8 animate-fade-in">
+                    <div class="flex items-center justify-between mb-6 px-2">
+                        <h3 class="text-xl font-bold text-slate-800">Your Workspaces</h3>
+                        <button onclick="signOutUser()" class="text-xs font-bold text-accent uppercase tracking-widest hover:underline">Logout</button>
+                    </div>
+                    <div id="discovery-list" class="space-y-4 max-h-[400px] overflow-y-auto pr-2 custom-scrollbar">
+                        </div>
+                    <div class="grid grid-cols-2 gap-4 mt-8">
+                        <button onclick="openModal('create-circle')" class="btn-premium h-14 rounded-2xl text-white font-bold shadow-lg">Create Trip</button>
+                        <button onclick="openModal('join-circle')" class="h-14 rounded-2xl border-2 border-slate-200 font-bold hover:bg-slate-50 transition-all">Join Trip</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <div id="app-shell" class="hidden min-h-screen bg-[#fcfdfe] pb-24 lg:pb-0 lg:pl-64">
+        
+        <aside class="hidden lg:flex fixed left-0 top-0 bottom-0 w-64 glass-premium border-r border-slate-200 flex-col z-50">
+            <div class="p-8">
+                <div class="flex items-center gap-3 mb-10">
+                    <div class="w-10 h-10 bg-brand-600 rounded-xl flex items-center justify-center text-white">
+                        <i class="fa-solid fa-bolt-lightning"></i>
+                    </div>
+                    <span class="text-2xl font-black tracking-tighter text-slate-900">TripSplit</span>
+                </div>
+                
+                <nav class="space-y-2">
+                    <button onclick="navigateTo('dashboard')" data-nav="dashboard" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-50 transition-all">
+                        <i class="fa-solid fa-chart-pie w-5"></i> Dashboard
+                    </button>
+                    <button onclick="navigateTo('timeline')" data-nav="timeline" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-50 transition-all">
+                        <i class="fa-solid fa-clock-rotate-left w-5"></i> Timeline
+                    </button>
+                    <button onclick="navigateTo('analytics')" data-nav="analytics" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-50 transition-all">
+                        <i class="fa-solid fa-money-bill-transfer w-5"></i> Settle Up
+                    </button>
+                    <button onclick="navigateTo('budget')" data-nav="budget" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-50 transition-all">
+                        <i class="fa-solid fa-vault w-5"></i> Budgeting
+                    </button>
+                    <button onclick="navigateTo('plans')" data-nav="plans" class="nav-btn w-full flex items-center gap-4 px-4 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-50 transition-all">
+                        <i class="fa-solid fa-crown w-5"></i> Upgrades
+                    </button>
+                    <button onclick="navigateTo('admin')" data-nav="admin" id="admin-sidebar-btn" class="nav-btn hidden w-full flex items-center gap-4 px-4 py-3 rounded-xl font-bold text-slate-500 hover:bg-slate-50 transition-all">
+                        <i class="fa-solid fa-shield-halved w-5 text-accent"></i> Admin
+                    </button>
+                </nav>
+            </div>
+            
+            <div class="mt-auto p-6 border-t border-slate-100">
+                <button onclick="navigateTo('profile')" class="w-full flex items-center gap-3 p-3 rounded-2xl hover:bg-slate-50 transition-all text-left">
+                    <img id="sidebar-avatar" src="" class="w-10 h-10 rounded-xl bg-slate-200 border border-slate-100" alt="User">
+                    <div class="flex-1 overflow-hidden">
+                        <p id="sidebar-name" class="font-bold text-slate-800 text-sm truncate">User Name</p>
+                        <p class="text-xs text-brand-600 font-bold">Standard Pro</p>
+                    </div>
+                </button>
+            </div>
+        </aside>
+
+        <header class="h-20 glass-premium sticky top-0 z-40 px-6 lg:px-10 flex items-center justify-between">
+            <div class="flex items-center gap-4">
+                <button onclick="goBackToDiscovery()" class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-all">
+                    <i class="fa-solid fa-arrow-left"></i>
+                </button>
+                <div>
+                    <h2 id="active-trip-name" class="text-xl font-black text-slate-900 leading-none mb-1">Trip Name</h2>
+                    <div class="flex items-center gap-2">
+                        <span id="active-trip-id" class="text-[10px] font-black uppercase tracking-widest text-brand-600 bg-brand-50 px-2 py-0.5 rounded cursor-pointer" onclick="copyTripID()">ID: ####</span>
+                        <div id="sync-status" class="flex items-center gap-1.5">
+                            <span class="w-1.5 h-1.5 rounded-full bg-success animate-pulse"></span>
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-tighter">Live Sync</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
-            <div id="successContent" style="display:none;" class="animate__animated animate__fadeIn">
-                <div class="display-1 mb-3">🕺</div>
-                <h1 class="main-title" style="color: var(--lavender);">Pack your bags!</h1>
-                <h4 class="fw-bold mt-2">Thats like a good Son <span id="loggedInUserName"></span></h4>
-                
-                <div class="countdown-container">
-                    <div class="time-box"><span class="time-val" id="days">00</span><span class="time-label">Days</span></div>
-                    <div class="time-box"><span class="time-val" id="hours">00</span><span class="time-label">Hrs</span></div>
-                    <div class="time-box"><span class="time-val" id="mins">00</span><span class="time-label">Mins</span></div>
-                    <div class="time-box"><span class="time-val" id="secs">00</span><span class="time-label">Secs</span></div>
+            <div class="flex items-center gap-3">
+                <div class="hidden md:flex items-center bg-slate-100 p-1 rounded-xl">
+                    <button onclick="changeCurrency('INR')" data-curr="INR" class="curr-btn px-3 py-1.5 text-xs font-black rounded-lg transition-all active-curr">INR</button>
+                    <button onclick="changeCurrency('USD')" data-curr="USD" class="curr-btn px-3 py-1.5 text-xs font-black rounded-lg transition-all text-slate-400">USD</button>
+                    <button onclick="changeCurrency('EUR')" data-curr="EUR" class="curr-btn px-3 py-1.5 text-xs font-black rounded-lg transition-all text-slate-400">EUR</button>
                 </div>
-                
-                <p class="text-muted mt-3">Ready for departure ✈️</p>
+                <button onclick="openModal('add-expense')" class="btn-premium w-10 h-10 lg:w-auto lg:px-6 lg:h-12 rounded-xl flex items-center justify-center gap-2 text-white shadow-brand-200">
+                    <i class="fa-solid fa-plus"></i>
+                    <span class="hidden lg:inline font-bold">Add Bill</span>
+                </button>
             </div>
-        </div>
+        </header>
+
+        <main id="view-container" class="p-6 lg:p-10 space-y-10">
+            
+            <section id="view-dashboard" class="view-pane active">
+                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
+                    <div class="card-premium p-6 bg-brand-600 border-none text-white relative overflow-hidden group">
+                        <div class="absolute -right-10 -top-10 w-40 h-40 bg-white opacity-10 rounded-full group-hover:scale-110 transition-transform"></div>
+                        <p class="text-xs font-bold uppercase tracking-widest opacity-80 mb-1">Total Trip Pool</p>
+                        <h3 id="stat-total-pool" class="text-4xl font-black">₹0.00</h3>
+                        <div class="mt-4 flex items-center gap-2 text-xs">
+                            <span class="bg-white/20 px-2 py-1 rounded-lg font-bold">All Members</span>
+                            <span id="stat-expense-count" class="opacity-80">0 transactions</span>
+                        </div>
+                    </div>
+
+                    <div class="card-premium p-6 relative overflow-hidden group">
+                        <div class="absolute right-4 top-4 w-10 h-10 bg-brand-50 rounded-xl flex items-center justify-center text-brand-600 transition-transform group-hover:rotate-12">
+                            <i class="fa-solid fa-hand-holding-dollar text-xl"></i>
+                        </div>
+                        <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Your Total Spend</p>
+                        <h3 id="stat-user-spend" class="text-4xl font-black text-slate-800">₹0.00</h3>
+                        <p class="mt-4 text-xs font-bold text-success">
+                            <i class="fa-solid fa-circle-check"></i> Recorded accurately
+                        </p>
+                    </div>
+
+                    <div class="card-premium p-6 relative overflow-hidden group">
+                        <div class="absolute right-4 top-4 w-10 h-10 bg-accent/10 rounded-xl flex items-center justify-center text-accent transition-transform group-hover:rotate-12">
+                            <i class="fa-solid fa-scale-balanced text-xl"></i>
+                        </div>
+                        <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Net Balance</p>
+                        <h3 id="stat-user-balance" class="text-4xl font-black text-slate-800">₹0.00</h3>
+                        <p id="stat-balance-label" class="mt-4 text-xs font-bold text-slate-400">Neutral State</p>
+                    </div>
+
+                    <div class="card-premium p-6 relative overflow-hidden group">
+                        <div class="absolute right-4 top-4 w-10 h-10 bg-warning/10 rounded-xl flex items-center justify-center text-warning transition-transform group-hover:rotate-12">
+                            <i class="fa-solid fa-bullseye text-xl"></i>
+                        </div>
+                        <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1">Trip Progress</p>
+                        <h3 id="stat-trip-progress" class="text-4xl font-black text-slate-800">0%</h3>
+                        <div class="mt-4 h-1.5 w-full bg-slate-100 rounded-full overflow-hidden">
+                            <div id="stat-budget-progress-bar" class="h-full bg-brand-500 w-0 transition-all duration-1000"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 space-y-8">
+                        <div class="flex items-center justify-between px-2">
+                            <h3 class="text-2xl font-black text-slate-800 tracking-tight">Recent Transactions</h3>
+                            <button onclick="navigateTo('timeline')" class="text-xs font-black text-brand-600 uppercase tracking-widest hover:underline">View All</button>
+                        </div>
+                        <div id="dashboard-recent-tx" class="space-y-4">
+                            </div>
+                    </div>
+
+                    <div class="space-y-8">
+                        <div class="flex items-center justify-between px-2">
+                            <h3 class="text-2xl font-black text-slate-800 tracking-tight">Active Members</h3>
+                            <div class="flex -space-x-3 overflow-hidden" id="dashboard-member-stack">
+                                </div>
+                        </div>
+                        <div id="dashboard-member-list" class="space-y-4">
+                            </div>
+                        
+                        <div class="card-premium p-6 bg-slate-900 text-white">
+                            <h4 class="text-sm font-bold mb-4 uppercase tracking-widest opacity-60">Trip Budget Limit</h4>
+                            <div class="flex items-end justify-between mb-2">
+                                <span id="budget-current" class="text-2xl font-black">₹0</span>
+                                <span id="budget-total" class="text-xs font-bold opacity-60">of ₹10,000</span>
+                            </div>
+                            <div class="h-2 w-full bg-white/10 rounded-full overflow-hidden mb-6">
+                                <div id="mini-budget-bar" class="h-full bg-brand-400 transition-all duration-1000" style="width: 0%"></div>
+                            </div>
+                            <button onclick="navigateTo('budget')" class="w-full py-3 bg-white/10 hover:bg-white/20 rounded-xl text-xs font-bold uppercase tracking-widest transition-all">Adjust Budget</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-timeline" class="view-pane">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
+                    <div>
+                        <h2 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Trip Timeline</h2>
+                        <p class="text-slate-500 font-medium">Full audit trail of your collective spending adventure.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="relative group">
+                            <i class="fa-solid fa-search absolute left-4 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-brand-600 transition-colors"></i>
+                            <input type="text" id="timeline-search" placeholder="Search expenses..." oninput="filterTimeline()" class="pl-12 pr-6 py-3 bg-slate-100 border-none rounded-2xl focus:ring-2 focus:ring-brand-500 transition-all text-sm font-bold">
+                        </div>
+                        <button onclick="exportTimelinePDF()" class="w-12 h-12 rounded-2xl bg-slate-100 flex items-center justify-center text-slate-600 hover:bg-slate-200 transition-all">
+                            <i class="fa-solid fa-file-pdf"></i>
+                        </button>
+                    </div>
+                </div>
+
+                <div class="space-y-12 relative pb-10">
+                    <div class="absolute left-6 top-0 bottom-0 w-0.5 bg-slate-100"></div>
+                    <div id="timeline-feed" class="space-y-8">
+                        </div>
+                </div>
+            </section>
+
+            <section id="view-analytics" class="view-pane">
+                <div class="mb-10">
+                    <h2 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Financial Insights</h2>
+                    <p class="text-slate-500 font-medium">Smart debt simplification and spending intelligence.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-10">
+                    <div class="card-premium p-8">
+                        <div class="flex items-center justify-between mb-8">
+                            <h3 class="text-xl font-bold text-slate-800">Settlement Suggestions</h3>
+                            <button onclick="calculateSettlements()" class="w-10 h-10 rounded-xl bg-brand-50 text-brand-600 flex items-center justify-center hover:bg-brand-100 transition-all">
+                                <i class="fa-solid fa-rotate"></i>
+                            </button>
+                        </div>
+                        <div id="settlement-results" class="space-y-4">
+                            <div class="py-10 text-center text-slate-400 font-medium italic">All debts clear or calculating...</div>
+                        </div>
+                    </div>
+
+                    <div class="card-premium p-8">
+                        <h3 class="text-xl font-bold text-slate-800 mb-8">Spending Distribution</h3>
+                        <div class="chart-container">
+                            <canvas id="categoryDistributionChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card-premium p-8">
+                    <h3 class="text-xl font-bold text-slate-800 mb-8">Trip Activity Velocity</h3>
+                    <div class="h-[300px]">
+                        <canvas id="velocitySeriesChart"></canvas>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-budget" class="view-pane">
+                <div class="mb-10">
+                    <h2 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Trip Budgeting</h2>
+                    <p class="text-slate-500 font-medium">Keep your spending in check with smart limits.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <div class="md:col-span-1 space-y-8">
+                        <div class="card-premium p-8 bg-brand-600 text-white">
+                            <p class="text-xs font-bold uppercase tracking-widest opacity-60 mb-4">Set Total Budget</p>
+                            <div class="flex items-center gap-3 mb-8">
+                                <span class="text-4xl font-black">₹</span>
+                                <input type="number" id="budget-input-field" value="10000" class="w-full bg-transparent text-4xl font-black border-none focus:ring-0 p-0 placeholder-white/50">
+                            </div>
+                            <button onclick="updateTripBudget()" class="w-full py-4 bg-white text-brand-600 rounded-2xl font-black text-sm uppercase tracking-widest hover:bg-slate-50 transition-all">Save Limit</button>
+                        </div>
+
+                        <div class="card-premium p-8">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-6">Budget Alerts</h4>
+                            <div class="space-y-4">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-sm font-bold text-slate-700">80% Threshold</span>
+                                    <div class="w-12 h-6 bg-brand-600 rounded-full relative p-1 cursor-pointer">
+                                        <div class="w-4 h-4 bg-white rounded-full ml-auto"></div>
+                                    </div>
+                                </div>
+                                <div class="flex items-center justify-between opacity-50">
+                                    <span class="text-sm font-bold text-slate-700">Daily Average Cap</span>
+                                    <div class="w-12 h-6 bg-slate-200 rounded-full relative p-1 cursor-pointer">
+                                        <div class="w-4 h-4 bg-white rounded-full"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="md:col-span-2">
+                        <div class="card-premium p-8 h-full">
+                            <h3 class="text-xl font-bold text-slate-800 mb-8">Category Wise Budgeting</h3>
+                            <div id="budget-category-list" class="space-y-8">
+                                </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-plans" class="view-pane">
+                <div class="max-w-4xl mx-auto text-center mb-16">
+                    <h2 class="text-5xl font-extrabold tracking-tight text-slate-900 mb-4">TripSplit Pro</h2>
+                    <p class="text-slate-500 text-lg font-medium">Unlock advanced automation and cloud intelligence.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-end">
+                    <div class="card-premium p-8 border-transparent hover:border-slate-200">
+                        <h4 class="text-xl font-black mb-1">Explorer</h4>
+                        <p class="text-slate-400 text-xs font-bold uppercase tracking-widest mb-6">Perfect for solo trips</p>
+                        <p class="text-4xl font-black mb-8">₹0 <span class="text-sm font-bold text-slate-400">/ forever</span></p>
+                        <ul class="space-y-4 mb-10 text-sm font-bold text-slate-500">
+                            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-success"></i> 1 Active Trip</li>
+                            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-success"></i> Basic Splits</li>
+                            <li class="flex items-center gap-3 opacity-30"><i class="fa-solid fa-xmark"></i> Multi-Currency</li>
+                        </ul>
+                        <button class="w-full py-4 rounded-2xl bg-slate-100 text-slate-600 font-black text-xs uppercase tracking-widest">Current Plan</button>
+                    </div>
+
+                    <div class="card-premium p-8 bg-brand-600 text-white transform md:scale-110 shadow-2xl relative">
+                        <div class="absolute -top-4 inset-x-0 mx-auto w-max px-4 py-1 bg-accent text-white rounded-full text-[10px] font-black uppercase tracking-widest">Best Value</div>
+                        <h4 class="text-xl font-black mb-1">Voyager</h4>
+                        <p class="text-white/60 text-xs font-bold uppercase tracking-widest mb-6">For global group trips</p>
+                        <p class="text-4xl font-black mb-8">₹199 <span class="text-sm font-bold text-white/60">/ trip</span></p>
+                        <ul class="space-y-4 mb-10 text-sm font-bold">
+                            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-white"></i> Unlimited Members</li>
+                            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-white"></i> Multi-Currency Cloud</li>
+                            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-white"></i> Export to PDF</li>
+                        </ul>
+                        <button onclick="triggerUpgradeProcess('Voyager', 199)" class="w-full py-4 rounded-2xl bg-white text-brand-600 font-black text-xs uppercase tracking-widest shadow-xl">Upgrade Now</button>
+                    </div>
+
+                    <div class="card-premium p-8 bg-slate-900 text-white">
+                        <h4 class="text-xl font-black mb-1">Nomad</h4>
+                        <p class="text-white/40 text-xs font-bold uppercase tracking-widest mb-6">For professional guides</p>
+                        <p class="text-4xl font-black mb-8">₹499 <span class="text-sm font-bold text-white/40">/ year</span></p>
+                        <ul class="space-y-4 mb-10 text-sm font-bold">
+                            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-brand-400"></i> Everything in Voyager</li>
+                            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-brand-400"></i> Receipt Cloud Backup</li>
+                            <li class="flex items-center gap-3"><i class="fa-solid fa-check text-brand-400"></i> API Access</li>
+                        </ul>
+                        <button onclick="triggerUpgradeProcess('Nomad', 499)" class="w-full py-4 rounded-2xl bg-white/10 text-white font-black text-xs uppercase tracking-widest border border-white/20">Go Unlimited</button>
+                    </div>
+                </div>
+
+                <div id="upgrade-payment-module" class="hidden mt-16 max-w-sm mx-auto animate-fade-in">
+                    <div class="card-premium p-10 bg-white border-2 border-brand-500 text-center shadow-2xl">
+                        <p class="text-xs font-black text-brand-600 uppercase tracking-widest mb-6">Complete Secure Checkout</p>
+                        <div class="bg-slate-50 p-6 rounded-[2.5rem] mb-8 inline-block shadow-inner">
+                            <img id="payment-upi-qr" src="" alt="UPI QR" class="w-48 h-48 rounded-xl">
+                        </div>
+                        <div class="mb-8">
+                            <p class="text-xs font-bold text-slate-400 uppercase tracking-tighter mb-1">Total Due</p>
+                            <p id="payment-amount-display" class="text-3xl font-black text-slate-900">₹0.00</p>
+                        </div>
+                        <div class="relative mb-4">
+                            <i class="fa-solid fa-hashtag absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                            <input type="text" id="payment-ref-id" placeholder="Transaction Ref ID" class="input-premium pl-12 text-center uppercase tracking-widest">
+                        </div>
+                        <button onclick="submitUpgradeVerification()" class="btn-premium w-full py-5 rounded-2xl text-white font-black shadow-brand-200">Verify Payment</button>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-profile" class="view-pane">
+                <div class="max-w-3xl mx-auto">
+                    <div class="card-premium p-12 text-center relative overflow-hidden mb-10">
+                        <div class="mesh-gradient absolute inset-0 opacity-10"></div>
+                        <div class="w-40 h-40 rounded-[3rem] overflow-hidden mx-auto mb-8 shadow-2xl border-4 border-white relative z-10">
+                            <img id="profile-pic-full" src="" class="w-full h-full object-cover">
+                        </div>
+                        <h2 id="profile-display-name" class="text-4xl font-black text-slate-900 tracking-tight mb-2 relative z-10">User Name</h2>
+                        <p id="profile-email-full" class="text-slate-500 font-medium mb-10 relative z-10">email@example.com</p>
+                        
+                        <div class="flex flex-wrap justify-center gap-3 relative z-10">
+                            <div class="bg-brand-50 text-brand-600 px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest border border-brand-100">
+                                Standard Voyager
+                            </div>
+                            <div class="bg-success/10 text-success px-6 py-2 rounded-full font-black text-[10px] uppercase tracking-widest">
+                                Cloud Verified
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div class="card-premium p-8">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8">Trip Statistics</h4>
+                            <div class="space-y-6">
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-500 font-medium">Completed Trips</span>
+                                    <span class="font-black text-slate-900">12</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-500 font-medium">Total Spending</span>
+                                    <span class="font-black text-slate-900">₹45,890</span>
+                                </div>
+                                <div class="flex items-center justify-between">
+                                    <span class="text-slate-500 font-medium">Friends Spliced</span>
+                                    <span class="font-black text-slate-900">28</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="card-premium p-8">
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-widest mb-8">Cloud Preferences</h4>
+                            <div class="space-y-6">
+                                <label class="flex items-center justify-between cursor-pointer">
+                                    <span class="text-slate-700 font-bold">Dark Mode</span>
+                                    <input type="checkbox" class="sr-only peer">
+                                    <div class="w-12 h-6 bg-slate-200 rounded-full peer peer-checked:bg-brand-600 relative transition-all">
+                                        <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all peer-checked:translate-x-6"></div>
+                                    </div>
+                                </label>
+                                <label class="flex items-center justify-between cursor-pointer">
+                                    <span class="text-slate-700 font-bold">Email Notifications</span>
+                                    <input type="checkbox" checked class="sr-only peer">
+                                    <div class="w-12 h-6 bg-slate-200 rounded-full peer peer-checked:bg-brand-600 relative transition-all">
+                                        <div class="absolute left-1 top-1 w-4 h-4 bg-white rounded-full transition-all peer-checked:translate-x-6"></div>
+                                    </div>
+                                </label>
+                                <button onclick="signOutUser()" class="w-full mt-4 py-4 bg-accent/10 text-accent rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-accent hover:text-white transition-all">Sign Out Account</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <section id="view-admin" class="view-pane">
+                <div class="flex items-center justify-between mb-10">
+                    <div>
+                        <h2 class="text-4xl font-black text-slate-900 tracking-tight mb-2">Command Center</h2>
+                        <p class="text-brand-600 font-bold uppercase text-xs tracking-widest">Global Cloud Monitoring System</p>
+                    </div>
+                    <div class="bg-success text-white px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2">
+                        <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span> Cluster Stable
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+                    <div class="card-premium p-6 bg-slate-900 text-white">
+                        <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Total Nodes</p>
+                        <h4 id="admin-stat-circles" class="text-4xl font-black">0</h4>
+                    </div>
+                    <div class="card-premium p-6 bg-slate-900 text-white">
+                        <p class="text-[10px] font-bold text-white/40 uppercase tracking-widest mb-1">Total Users</p>
+                        <h4 id="admin-stat-users" class="text-4xl font-black">0</h4>
+                    </div>
+                    <div class="card-premium p-6 bg-white border-2 border-brand-500">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">Pending Subs</p>
+                        <h4 id="admin-stat-pending" class="text-4xl font-black text-brand-600">0</h4>
+                    </div>
+                    <div class="card-premium p-6 bg-white">
+                        <p class="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-1">System Latency</p>
+                        <h4 class="text-4xl font-black text-slate-800">42ms</h4>
+                    </div>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <div class="lg:col-span-2 space-y-8">
+                        <div class="card-premium p-8">
+                            <h3 class="text-xl font-bold text-slate-800 mb-8">Upgrade Queue</h3>
+                            <div id="admin-sub-queue" class="space-y-4">
+                                </div>
+                        </div>
+                    </div>
+                    
+                    <div class="space-y-8">
+                        <div class="card-premium p-8">
+                            <h3 class="text-xl font-bold text-slate-800 mb-6">Global Broadcast</h3>
+                            <textarea id="admin-broadcast-msg" rows="4" class="input-premium mb-6" placeholder="Enter system announcement..."></textarea>
+                            <button onclick="publishGlobalBroadcast()" class="btn-premium w-full py-4 text-white font-black text-xs uppercase tracking-widest">Publish Cloud Notice</button>
+                        </div>
+                        
+                        <div class="card-premium p-8">
+                            <h3 class="text-xl font-bold text-slate-800 mb-6">User Lookup</h3>
+                            <div class="relative mb-6">
+                                <i class="fa-solid fa-at absolute left-4 top-1/2 -translate-y-1/2 text-slate-400"></i>
+                                <input type="text" id="admin-lookup-email" placeholder="email@address.com" class="input-premium pl-12">
+                            </div>
+                            <button onclick="lookupUserByEmail()" class="w-full py-4 bg-slate-100 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-slate-200 transition-all">Fetch Identity</button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <nav class="lg:hidden fixed bottom-6 left-1/2 -translate-x-1/2 w-[92%] glass-premium rounded-[2.5rem] h-20 shadow-2xl border border-white/50 flex items-center justify-around px-4 z-50">
+            <button onclick="navigateTo('dashboard')" class="mobile-nav-btn text-slate-400 text-xl w-14 h-14 flex items-center justify-center transition-all" data-nav="dashboard">
+                <i class="fa-solid fa-chart-pie"></i>
+            </button>
+            <button onclick="navigateTo('timeline')" class="mobile-nav-btn text-slate-400 text-xl w-14 h-14 flex items-center justify-center transition-all" data-nav="timeline">
+                <i class="fa-solid fa-clock-rotate-left"></i>
+            </button>
+            <button onclick="navigateTo('analytics')" class="mobile-nav-btn text-slate-400 text-xl w-14 h-14 flex items-center justify-center transition-all" data-nav="analytics">
+                <i class="fa-solid fa-money-bill-transfer"></i>
+            </button>
+            <button onclick="navigateTo('profile')" class="mobile-nav-btn w-12 h-12 rounded-2xl overflow-hidden border-2 border-white shadow-lg active:scale-90 transition-transform" data-nav="profile">
+                <img id="mobile-nav-avatar" src="" class="w-full h-full object-cover">
+            </button>
+        </nav>
     </div>
 
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-auth-compat.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <div id="modal-overlay" class="fixed inset-0 z-[1100] bg-slate-900/40 backdrop-blur-md hidden items-center justify-center p-6 transition-all duration-300">
+        <div id="modal-container" class="card-premium w-full max-w-xl p-0 overflow-hidden transform scale-95 opacity-0 transition-all duration-300">
+            </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-database-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
     <script>
+        /* =============================================================================
+           TRIPSPLIT CORE LOGIC - ENGINE 2026
+           ============================================================================= */
+
         const firebaseConfig = {
-            apiKey: "AIzaSyBatvEQWMtgwEd3rASMbNbkO46WGXJpEzI",
-            authDomain: "home-9c9bb.firebaseapp.com",
-            projectId: "home-9c9bb",
-            storageBucket: "home-9c9bb.firebasestorage.app",
-            messagingSenderId: "326102883938",
-            appId: "1:326102883938:web:e2848f39a9f6fbc4557b3b"
+            apiKey: "AIzaSyCpLtdJ4lACW9pNn8fAUmooooqzh_5TIO4",
+            authDomain: "trip-ddc48.firebaseapp.com",
+            databaseURL: "https://trip-ddc48-default-rtdb.firebaseio.com",
+            projectId: "trip-ddc48",
+            storageBucket: "trip-ddc48.firebasestorage.app"
         };
+
+        // Core App State
+        const AppState = {
+            user: null,
+            activeCircleId: null,
+            circleData: null,
+            subscription: 'Free',
+            activeView: 'dashboard',
+            currency: 'INR',
+            conversionRates: { 'INR': 1, 'USD': 0.012, 'EUR': 0.011 },
+            charts: {
+                dist: null,
+                vel: null
+            },
+            filters: {
+                timelineSearch: '',
+                category: 'all'
+            },
+            admin: {
+                circles: 0,
+                users: 0,
+                pending: 0
+            }
+        };
+
+        const ADMIN_EMAIL = "akhilgoel985@gmail.com";
+        const MASTER_UPI = "akhilgoel985-2@okaxis";
+
+        // Initialization
         firebase.initializeApp(firebaseConfig);
+        const db = firebase.database();
         const auth = firebase.auth();
-        const db = firebase.firestore();
-        const AKHIL_EMAIL = "akhilgoel985@gmail.com";
-        let targetDate;
-        let userDisplayName = "";
+        const provider = new firebase.auth.GoogleAuthProvider();
 
-        function toggleSidebar() { document.getElementById('adminSidebar').classList.toggle('active'); }
-
-        // --- MAGIC HEART CLICKS ---
-        document.addEventListener('mousedown', (e) => {
-            if (e.target.tagName === 'BUTTON' || e.target.closest('#adminSidebar')) return;
-            const heart = document.createElement('div');
-            heart.className = 'click-heart bi bi-heart-fill';
-            heart.style.left = (e.clientX - 12) + 'px';
-            heart.style.top = (e.clientY - 12) + 'px';
-            heart.style.color = ['#8e44ad', '#ff758c', '#ffffff'][Math.floor(Math.random() * 3)];
-            document.body.appendChild(heart);
-            setTimeout(() => heart.remove(), 1500);
-        });
-
-        // --- AUTH ---
-        document.getElementById('loginBtn').onclick = () => auth.signInWithPopup(new firebase.auth.GoogleAuthProvider());
-        auth.onAuthStateChanged(user => {
+        // Auth Listener
+        auth.onAuthStateChanged(async (user) => {
             if (user) {
-                userDisplayName = user.displayName;
-                document.getElementById('authScreen').style.display = 'none';
-                document.getElementById('appUI').style.display = 'flex';
-                if (user.email === AKHIL_EMAIL) document.getElementById('gearBtn').style.display = 'flex';
-                syncData();
-            }
-        });
-
-        async function syncData() {
-            const doc = await db.collection("proposal").doc("config").get();
-            if (doc.exists) {
-                const data = doc.data();
-                if(data.destination) document.getElementById('questionText').innerHTML = `Heading to <span class="dest-highlight">${data.destination}</span>`;
-                if(data.name) document.getElementById('nameInput').value = data.name;
-                if(data.destination) document.getElementById('tripInput').value = data.destination;
-                if(data.tripDate) {
-                    targetDate = new Date(data.tripDate);
-                    document.getElementById('dateInput').value = data.tripDate;
+                AppState.user = user;
+                document.querySelectorAll('[id*="avatar"]').forEach(el => el.src = user.photoURL);
+                document.querySelectorAll('[id*="sidebar-name"]').forEach(el => el.innerText = user.displayName);
+                document.querySelectorAll('[id*="profile-email-full"]').forEach(el => el.innerText = user.email);
+                document.querySelectorAll('[id*="profile-display-name"]').forEach(el => el.innerText = user.displayName);
+                
+                if (user.email.toLowerCase() === ADMIN_EMAIL.toLowerCase()) {
+                    document.getElementById('admin-sidebar-btn').classList.remove('hidden');
+                    document.getElementById('mobile-admin-btn')?.classList.remove('hidden');
+                    initAdminWatchers();
                 }
-            }
-        }
 
-        document.getElementById('saveBtn').onclick = async () => {
-            const name = document.getElementById('nameInput').value;
-            const destination = document.getElementById('tripInput').value;
-            const tripDate = document.getElementById('dateInput').value;
-            await db.collection("proposal").doc("config").set({ name, destination, tripDate }, { merge: true });
-            location.reload();
-        };
-
-        // --- TRIP LOGIC ---
-        const noBtn = document.getElementById('noBtn');
-        const yesBtn = document.getElementById('yesBtn');
-        const instruction = document.getElementById('instructionLabel');
-        let hasClickedNo = false;
-        
-        const noClickPrompts = [
-            "Wait! First click on No button",
-            "Are you deaf? Click on the NO button first!",
-            "Don't be so eager, click No first!",
-            "Rules are rules, find the No button!",
-            "Click No or the trip is cancelled!"
-        ];
-        let promptIndex = 0;
-
-        yesBtn.onclick = () => {
-            if (!hasClickedNo) {
-                instruction.innerText = noClickPrompts[promptIndex % noClickPrompts.length];
-                instruction.classList.remove('animate__shakeX');
-                void instruction.offsetWidth; 
-                instruction.classList.add('animate__shakeX');
-                promptIndex++;
+                initUserCloud(user.uid);
+                initGlobalBroadcaster();
+                
+                // Switch UI to Discovery
+                hideElement('global-loader');
+                showElement('auth-screen');
+                hideElement('login-form-container');
+                showElement('discovery-module');
+                
+                fetchWorkspaces(user.email.toLowerCase());
             } else {
-                document.getElementById('proposalContent').style.display = 'none';
-                document.getElementById('successContent').style.display = 'block';
-                document.getElementById('loggedInUserName').innerText = userDisplayName || "";
-                confetti({ particleCount: 200, spread: 80, origin: { y: 0.6 } });
-                startCountdown();
+                AppState.user = null;
+                hideElement('app-shell');
+                showElement('auth-screen');
+                showElement('login-form-container');
+                hideElement('discovery-module');
+                hideElement('global-loader');
             }
-        };
-
-        function teleportNo() {
-            const yesRect = yesBtn.getBoundingClientRect();
-            const padding = 150;
-            let randomX, randomY;
-            let isOverlapping = true;
-
-            while (isOverlapping) {
-                randomX = Math.random() * (window.innerWidth - noBtn.offsetWidth - 40) + 20;
-                randomY = Math.random() * (window.innerHeight - noBtn.offsetHeight - 40) + 20;
-                const overlapsYes = !(randomX + noBtn.offsetWidth < yesRect.left - padding || 
-                                     randomX > yesRect.right + padding || 
-                                     randomY + noBtn.offsetHeight < yesRect.top - padding || 
-                                     randomY > yesRect.bottom + padding);
-
-                if (!overlapsYes) isOverlapping = false;
-            }
-
-            noBtn.style.position = 'fixed';
-            noBtn.style.left = randomX + 'px';
-            noBtn.style.top = randomY + 'px';
-        }
-
-        noBtn.onclick = (e) => {
-            e.preventDefault();
-            hasClickedNo = true;
-            instruction.innerText = "Why! When your DaD is coming then why you say No? Say Yes!";
-            instruction.style.color = "#2ecc71"; 
-            teleportNo(); 
-        };
-
-        noBtn.addEventListener('mouseenter', () => {
-            if (hasClickedNo) teleportNo();
         });
 
-        // --- COUNTDOWN LOGIC ---
-        function startCountdown() {
-            if(!targetDate) return;
-            setInterval(() => {
-                const now = new Date().getTime();
-                const distance = targetDate - now;
-                if (distance > 0) {
-                    document.getElementById('days').innerText = Math.floor(distance / (1000 * 60 * 60 * 24)).toString().padStart(2, '0');
-                    document.getElementById('hours').innerText = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60)).toString().padStart(2, '0');
-                    document.getElementById('mins').innerText = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60)).toString().padStart(2, '0');
-                    document.getElementById('secs').innerText = Math.floor((distance % (1000 * 60)) / 1000).toString().padStart(2, '0');
+        // -------------------------------------------------------------------------
+        // WORKSPACE & CLOUD SYNC
+        // -------------------------------------------------------------------------
+
+        function fetchWorkspaces(email) {
+            const list = document.getElementById('discovery-list');
+            list.innerHTML = `
+                <div class="skeleton h-24 rounded-3xl mb-4"></div>
+                <div class="skeleton h-24 rounded-3xl mb-4"></div>
+            `;
+
+            db.ref('groups').on('value', snap => {
+                list.innerHTML = '';
+                const groups = snap.val() || {};
+                let count = 0;
+
+                Object.entries(groups).forEach(([id, g]) => {
+                    const members = g.members || [];
+                    if (members.some(m => m.email.toLowerCase() === email)) {
+                        count++;
+                        const card = document.createElement('div');
+                        card.className = "card-premium p-6 flex justify-between items-center cursor-pointer hover:border-brand-500 transition-all group active:scale-95";
+                        card.onclick = () => mountWorkspace(id);
+                        card.innerHTML = `
+                            <div class="flex items-center gap-5">
+                                <div class="w-14 h-14 bg-brand-50 rounded-2xl flex items-center justify-center text-brand-600 font-black text-2xl group-hover:bg-brand-600 group-hover:text-white transition-all">
+                                    ${g.name[0]}
+                                </div>
+                                <div class="text-left">
+                                    <h4 class="font-extrabold text-slate-900 group-hover:text-brand-600">${g.name}</h4>
+                                    <div class="flex gap-2">
+                                        <span class="text-[9px] font-black uppercase tracking-widest text-brand-400">${id}</span>
+                                        <span class="text-[9px] font-black uppercase tracking-widest text-slate-300">${members.length} Members</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="w-10 h-10 rounded-full bg-slate-50 flex items-center justify-center text-slate-400 opacity-0 group-hover:opacity-100 transition-all">
+                                <i class="fa-solid fa-chevron-right"></i>
+                            </div>
+                        `;
+                        list.appendChild(card);
+                    }
+                });
+
+                if (count === 0) {
+                    list.innerHTML = `
+                        <div class="py-12 px-6 border-2 border-dashed border-slate-100 rounded-3xl text-center">
+                            <i class="fa-solid fa-map-location-dot text-4xl text-slate-200 mb-4"></i>
+                            <p class="text-slate-400 font-bold">No active trip workspaces found.</p>
+                        </div>
+                    `;
                 }
-            }, 1000);
+            });
         }
+
+        async function mountWorkspace(id) {
+            showElement('global-loader');
+            AppState.activeCircleId = id;
+
+            db.ref(`groups/${id}`).on('value', snap => {
+                const data = snap.val();
+                if (!data) return;
+                
+                AppState.circleData = data;
+                hideElement('auth-screen');
+                showElement('app-shell');
+                hideElement('global-loader');
+                
+                renderActiveWorkspace();
+                syncSyncUI();
+            });
+        }
+
+        function renderActiveWorkspace() {
+            const data = AppState.circleData;
+            document.getElementById('active-trip-name').innerText = data.name;
+            document.getElementById('active-trip-id').innerText = `ID: ${AppState.activeCircleId}`;
+            
+            // Logic Switches
+            refreshDashboard();
+            refreshTimeline();
+            refreshAnalytics();
+            refreshBudget();
+        }
+
+        // -------------------------------------------------------------------------
+        // UI CORE MODULES
+        // -------------------------------------------------------------------------
+
+        function navigateTo(viewId) {
+            AppState.activeView = viewId;
+            document.querySelectorAll('.view-pane').forEach(p => p.classList.remove('active'));
+            document.getElementById(`view-${viewId}`).classList.add('active');
+
+            // Nav Highlighting
+            document.querySelectorAll('.nav-btn').forEach(btn => {
+                const isActive = btn.getAttribute('data-nav') === viewId;
+                btn.classList.toggle('text-brand-600', isActive);
+                btn.classList.toggle('bg-brand-50', isActive);
+                btn.classList.toggle('text-slate-500', !isActive);
+                btn.classList.toggle('bg-slate-50', false);
+            });
+
+            document.querySelectorAll('.mobile-nav-btn').forEach(btn => {
+                const isActive = btn.getAttribute('data-nav') === viewId;
+                btn.classList.toggle('text-brand-600', isActive);
+                btn.classList.toggle('text-slate-400', !isActive);
+            });
+
+            if (viewId === 'analytics') refreshAnalytics();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function refreshDashboard() {
+            const expenses = AppState.circleData.expenses || {};
+            const members = AppState.circleData.members || [];
+            const userEmail = AppState.user.email.toLowerCase();
+            
+            let totalPool = 0;
+            const balances = {};
+            members.forEach(m => balances[m.name] = 0);
+
+            const txList = Object.entries(expenses).reverse();
+            txList.forEach(([key, e]) => {
+                const amt = parseFloat(e.amount);
+                totalPool += amt;
+                const share = amt / e.involved.length;
+                e.involved.forEach(name => {
+                    if (balances.hasOwnProperty(name)) balances[name] -= share;
+                });
+                // The person who paid gets credit
+                if (balances.hasOwnProperty(e.by)) balances[e.by] += amt;
+            });
+
+            // Update Primary Stats
+            animateCounter('stat-total-pool', totalPool);
+            document.getElementById('stat-expense-count').innerText = `${txList.length} transactions`;
+
+            const currentUserObj = members.find(m => m.email.toLowerCase() === userEmail);
+            if (currentUserObj) {
+                const myNet = balances[currentUserObj.name] || 0;
+                animateCounter('stat-user-balance', myNet);
+                
+                const label = document.getElementById('stat-balance-label');
+                if (myNet > 1) {
+                    label.innerText = "You are owed money";
+                    label.className = "mt-4 text-xs font-black text-success uppercase tracking-widest";
+                } else if (myNet < -1) {
+                    label.innerText = "You owe money";
+                    label.className = "mt-4 text-xs font-black text-accent uppercase tracking-widest";
+                } else {
+                    label.innerText = "All settled up";
+                    label.className = "mt-4 text-xs font-black text-slate-400 uppercase tracking-widest";
+                }
+
+                // Calculate User's Total Spend (where they were the payer)
+                let userPaidTotal = 0;
+                txList.forEach(([k, e]) => { if(e.by === currentUserObj.name) userPaidTotal += parseFloat(e.amount); });
+                animateCounter('stat-user-spend', userPaidTotal);
+            }
+
+            // Member List Rendering
+            const memberContainer = document.getElementById('dashboard-member-list');
+            const avatarStack = document.getElementById('dashboard-member-stack');
+            memberContainer.innerHTML = '';
+            avatarStack.innerHTML = '';
+
+            members.forEach(m => {
+                const initials = m.name.substring(0, 2).toUpperCase();
+                const bal = balances[m.name] || 0;
+                const isPositive = bal >= 0;
+
+                // Member Card
+                const mCard = document.createElement('div');
+                mCard.className = "card-premium p-4 flex items-center justify-between";
+                mCard.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="w-10 h-10 rounded-xl bg-slate-100 flex items-center justify-center text-[10px] font-black text-slate-500">
+                            ${initials}
+                        </div>
+                        <p class="font-bold text-slate-800">${m.name}</p>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-xs font-black ${isPositive ? 'text-success' : 'text-accent'} uppercase tracking-tighter">
+                            ${isPositive ? 'Receives' : 'Owes'}
+                        </p>
+                        <p class="font-black text-slate-900">${formatCurrency(Math.abs(bal))}</p>
+                    </div>
+                `;
+                memberContainer.appendChild(mCard);
+
+                // Avatar Stack
+                avatarStack.innerHTML += `
+                    <div class="w-8 h-8 rounded-full bg-white border-2 border-white overflow-hidden shadow-sm flex items-center justify-center bg-slate-200 text-[8px] font-black text-slate-600">
+                        ${initials}
+                    </div>
+                `;
+            });
+
+            // Recent Feed Snippet
+            const recentContainer = document.getElementById('dashboard-recent-tx');
+            recentContainer.innerHTML = '';
+            txList.slice(0, 5).forEach(([key, e]) => {
+                const card = createTransactionComponent(e);
+                recentContainer.appendChild(card);
+            });
+        }
+
+        function refreshTimeline() {
+            const feed = document.getElementById('timeline-feed');
+            const expenses = AppState.circleData.expenses || {};
+            const txList = Object.entries(expenses).reverse();
+
+            if (txList.length === 0) {
+                feed.innerHTML = `
+                    <div class="py-20 text-center opacity-40">
+                        <i class="fa-solid fa-ghost text-4xl mb-4"></i>
+                        <p class="font-bold">No history recorded yet.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Group by Date
+            const groups = {};
+            txList.forEach(([key, e]) => {
+                const date = e.date || 'Unknown Date';
+                if (!groups[date]) groups[date] = [];
+                groups[date].push(e);
+            });
+
+            feed.innerHTML = '';
+            Object.keys(groups).forEach(date => {
+                const groupDiv = document.createElement('div');
+                groupDiv.className = "relative pl-14";
+                groupDiv.innerHTML = `
+                    <div class="absolute left-4 top-1 w-4 h-4 rounded-full bg-brand-500 border-4 border-white shadow-sm z-10"></div>
+                    <h4 class="text-xs font-black text-slate-400 uppercase tracking-[0.2em] mb-6">${date}</h4>
+                    <div class="space-y-4">
+                        ${groups[date].map(e => createTransactionComponent(e, true).outerHTML).join('')}
+                    </div>
+                `;
+                feed.appendChild(groupDiv);
+            });
+        }
+
+        // -------------------------------------------------------------------------
+        // EXPENSE ENGINE
+        // -------------------------------------------------------------------------
+
+        function createTransactionComponent(e, full = false) {
+            const div = document.createElement('div');
+            div.className = "card-premium p-5 flex items-center justify-between group relative overflow-hidden";
+            
+            const amt = parseFloat(e.amount);
+            const category = e.category || 'other';
+            const icon = getCategoryIcon(category);
+
+            div.innerHTML = `
+                <div class="flex items-center gap-5">
+                    <div class="w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-brand-50 group-hover:text-brand-600 transition-all">
+                        <i class="${icon} text-lg"></i>
+                    </div>
+                    <div>
+                        <h5 class="font-bold text-slate-900 leading-none mb-1.5">${e.title}</h5>
+                        <p class="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                            PAID BY <span class="text-brand-600">${e.by}</span> &bull; ${e.involved.length} SPLIT
+                        </p>
+                    </div>
+                </div>
+                <div class="text-right">
+                    <p class="text-lg font-black text-slate-900">${formatCurrency(amt)}</p>
+                    ${full ? `<p class="text-[9px] font-black text-slate-300 uppercase">${e.timestamp ? new Date(e.timestamp).toLocaleTimeString() : ''}</p>` : ''}
+                </div>
+            `;
+            return div;
+        }
+
+        async function handlePublishTx() {
+            const title = document.getElementById('tx-title').value.trim();
+            const amount = document.getElementById('tx-amount').value.trim();
+            const category = document.querySelector('input[name="tx-cat"]:checked')?.value || 'other';
+            const involved = Array.from(document.querySelectorAll('.chip-active')).map(c => c.dataset.name);
+
+            if (!title || !amount || !involved.length) {
+                showToast("Missing required expense details", "error");
+                return;
+            }
+
+            const payerName = AppState.user.displayName.split(' ')[0];
+            const newTx = {
+                title,
+                amount: parseFloat(amount),
+                category,
+                involved,
+                by: payerName,
+                timestamp: Date.now(),
+                date: new Date().toLocaleDateString('en-GB', { day: '2-digit', month: 'short', year: 'numeric' })
+            };
+
+            try {
+                await db.ref(`groups/${AppState.activeCircleId}/expenses`).push(newTx);
+                showToast("Expense added to cloud", "success");
+                closeModal();
+                
+                // Track locally for UI smoothness
+                refreshDashboard();
+            } catch (err) {
+                showToast("Cloud synchronization failed", "error");
+            }
+        }
+
+        // -------------------------------------------------------------------------
+        // ANALYTICS & SETTLEMENTS
+        // -------------------------------------------------------------------------
+
+        function calculateSettlements() {
+            const expenses = AppState.circleData.expenses || {};
+            const members = AppState.circleData.members || [];
+            
+            const balances = {};
+            members.forEach(m => balances[m.name] = 0);
+
+            Object.values(expenses).forEach(e => {
+                const amt = parseFloat(e.amount);
+                const share = amt / e.involved.length;
+                e.involved.forEach(name => { if (balances.hasOwnProperty(name)) balances[name] -= share; });
+                if (balances.hasOwnProperty(e.by)) balances[e.by] += amt;
+            });
+
+            // Debt Minimization Algorithm
+            const creditors = [];
+            const debtors = [];
+            Object.entries(balances).forEach(([name, bal]) => {
+                if (bal > 0.1) creditors.push({ name, bal });
+                else if (bal < -0.1) debtors.push({ name, bal: Math.abs(bal) });
+            });
+
+            const resultsContainer = document.getElementById('settlement-results');
+            resultsContainer.innerHTML = '';
+
+            if (creditors.length === 0 && debtors.length === 0) {
+                resultsContainer.innerHTML = `
+                    <div class="py-12 text-center">
+                        <i class="fa-solid fa-circle-check text-4xl text-success mb-4"></i>
+                        <p class="font-bold text-slate-900 uppercase text-xs tracking-widest">Everything is crystal clear</p>
+                    </div>
+                `;
+                return;
+            }
+
+            // Greedy settlement
+            let i = 0, j = 0;
+            while (i < debtors.length && j < creditors.length) {
+                const amount = Math.min(debtors[i].bal, creditors[j].bal);
+                const item = document.createElement('div');
+                item.className = "card-premium p-5 flex items-center justify-between border-l-4 border-l-brand-500";
+                item.innerHTML = `
+                    <div class="flex items-center gap-4">
+                        <div class="text-left">
+                            <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Payer</p>
+                            <p class="font-bold text-slate-800">${debtors[i].name}</p>
+                        </div>
+                        <i class="fa-solid fa-arrow-right-long text-slate-300"></i>
+                        <div class="text-left">
+                            <p class="text-[9px] font-black text-slate-400 uppercase mb-1">Receiver</p>
+                            <p class="font-bold text-slate-800">${creditors[j].name}</p>
+                        </div>
+                    </div>
+                    <div class="text-right">
+                        <p class="text-lg font-black text-slate-900">${formatCurrency(amount)}</p>
+                        <button class="text-[10px] font-black text-brand-600 uppercase tracking-widest">Pay via UPI</button>
+                    </div>
+                `;
+                resultsContainer.appendChild(item);
+
+                debtors[i].bal -= amount;
+                creditors[j].bal -= amount;
+                if (debtors[i].bal < 0.1) i++;
+                if (creditors[j].bal < 0.1) j++;
+            }
+        }
+
+        function refreshAnalytics() {
+            const expenses = Object.values(AppState.circleData.expenses || {});
+            
+            // Category Dist
+            const catData = {};
+            expenses.forEach(e => {
+                const cat = e.category || 'other';
+                catData[cat] = (catData[cat] || 0) + parseFloat(e.amount);
+            });
+
+            const ctx = document.getElementById('categoryDistributionChart').getContext('2d');
+            if (AppState.charts.dist) AppState.charts.dist.destroy();
+            AppState.charts.dist = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: Object.keys(catData).map(k => k.toUpperCase()),
+                    datasets: [{
+                        data: Object.values(catData),
+                        backgroundColor: ['#6366f1', '#f43f5e', '#10b981', '#f59e0b', '#334155', '#94a3b8'],
+                        borderWidth: 0,
+                        hoverOffset: 20
+                    }]
+                },
+                options: {
+                    cutout: '80%',
+                    plugins: { legend: { position: 'bottom', labels: { font: { family: 'Plus Jakarta Sans', weight: 'bold', size: 10 } } } }
+                }
+            });
+
+            // Velocity Chart
+            const velCtx = document.getElementById('velocitySeriesChart').getContext('2d');
+            const dates = [...new Set(expenses.map(e => e.date))].sort();
+            const dataPts = dates.map(d => expenses.filter(e => e.date === d).reduce((acc, curr) => acc + parseFloat(curr.amount), 0));
+
+            if (AppState.charts.vel) AppState.charts.vel.destroy();
+            AppState.charts.vel = new Chart(velCtx, {
+                type: 'line',
+                data: {
+                    labels: dates,
+                    datasets: [{
+                        label: 'Daily Spending',
+                        data: dataPts,
+                        borderColor: '#6366f1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        pointRadius: 5,
+                        pointBackgroundColor: '#fff',
+                        pointBorderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: { beginAtZero: true, grid: { display: false } },
+                        x: { grid: { display: false } }
+                    }
+                }
+            });
+            
+            calculateSettlements();
+        }
+
+        // -------------------------------------------------------------------------
+        // BUDGET MODULE
+        // -------------------------------------------------------------------------
+
+        function refreshBudget() {
+            const expenses = Object.values(AppState.circleData.expenses || {});
+            const totalBudget = AppState.circleData.budget || 10000;
+            const currentTotal = expenses.reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
+            
+            document.getElementById('budget-current').innerText = formatCurrency(currentTotal);
+            document.getElementById('budget-total').innerText = `of ${formatCurrency(totalBudget)}`;
+            document.getElementById('budget-input-field').value = totalBudget;
+            
+            const pct = Math.min((currentTotal / totalBudget) * 100, 100);
+            document.getElementById('mini-budget-bar').style.width = pct + '%';
+            document.getElementById('stat-budget-progress-bar').style.width = pct + '%';
+            document.getElementById('stat-trip-progress').innerText = Math.round(pct) + '%';
+
+            // Category Wise
+            const catList = document.getElementById('budget-category-list');
+            catList.innerHTML = '';
+            const cats = ['food', 'transport', 'stay', 'shopping', 'fun', 'other'];
+            
+            cats.forEach(c => {
+                const catTotal = expenses.filter(e => e.category === c).reduce((acc, curr) => acc + parseFloat(curr.amount), 0);
+                const row = document.createElement('div');
+                const rowPct = totalBudget > 0 ? (catTotal / totalBudget) * 100 : 0;
+                
+                row.innerHTML = `
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center text-slate-500">
+                                <i class="${getCategoryIcon(c)} text-xs"></i>
+                            </div>
+                            <span class="text-sm font-bold text-slate-700 capitalize">${c}</span>
+                        </div>
+                        <span class="text-sm font-black text-slate-900">${formatCurrency(catTotal)}</span>
+                    </div>
+                    <div class="h-1.5 w-full bg-slate-100 rounded-full">
+                        <div class="h-full bg-slate-400 rounded-full" style="width: ${Math.min(rowPct * 2.5, 100)}%"></div>
+                    </div>
+                `;
+                catList.appendChild(row);
+            });
+        }
+
+        async function updateTripBudget() {
+            const val = parseFloat(document.getElementById('budget-input-field').value);
+            if (isNaN(val) || val <= 0) return;
+            
+            await db.ref(`groups/${AppState.activeCircleId}/budget`).set(val);
+            showToast("Budget limit updated", "success");
+            refreshBudget();
+        }
+
+        // -------------------------------------------------------------------------
+        // ADMIN COMMANDS
+        // -------------------------------------------------------------------------
+
+        function initAdminWatchers() {
+            db.ref('groups').on('value', s => {
+                AppState.admin.circles = s.numChildren();
+                document.getElementById('admin-stat-circles').innerText = s.numChildren();
+            });
+
+            db.ref('subscription_requests').on('value', snap => {
+                const q = document.getElementById('admin-sub-queue');
+                const requests = snap.val() || {};
+                AppState.admin.pending = Object.keys(requests).length;
+                document.getElementById('admin-stat-pending').innerText = AppState.admin.pending;
+                
+                q.innerHTML = '';
+                if (AppState.admin.pending === 0) {
+                    q.innerHTML = `<p class="py-10 text-center text-slate-300 font-bold italic">No pending verifications.</p>`;
+                    return;
+                }
+
+                Object.entries(requests).forEach(([id, r]) => {
+                    const row = document.createElement('div');
+                    row.className = "card-premium p-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-l-4 border-brand-500";
+                    row.innerHTML = `
+                        <div>
+                            <p class="text-xs font-black text-brand-600 uppercase tracking-widest mb-1">${r.tier} Request</p>
+                            <h5 class="font-bold text-slate-900">${r.name} (${r.email})</h5>
+                            <p class="text-[10px] font-mono text-slate-400 uppercase">REF: ${r.ref}</p>
+                        </div>
+                        <div class="flex gap-2">
+                            <button onclick="approveSubscription('${id}', '${r.uid}', '${r.tier}')" class="px-6 py-2 bg-success text-white rounded-xl font-bold text-xs uppercase tracking-widest shadow-lg shadow-success/20">Approve</button>
+                            <button onclick="rejectSubscription('${id}')" class="px-6 py-2 bg-slate-100 text-slate-500 rounded-xl font-bold text-xs uppercase tracking-widest">Ignore</button>
+                        </div>
+                    `;
+                    q.appendChild(row);
+                });
+            });
+        }
+
+        async function approveSubscription(reqId, uid, tier) {
+            await db.ref(`active_subscriptions/${uid}`).set({ tier, grantedAt: new Date().toISOString() });
+            await db.ref(`subscription_requests/${reqId}`).remove();
+            showToast(`User upgraded to ${tier}`, "success");
+        }
+
+        async function publishGlobalBroadcast() {
+            const msg = document.getElementById('admin-broadcast-msg').value.trim();
+            if (!msg) return;
+            await db.ref('broadcasts').set({ text: msg, at: Date.now() });
+            document.getElementById('admin-broadcast-msg').value = '';
+            showToast("Global notice broadcasted", "success");
+        }
+
+        // -------------------------------------------------------------------------
+        // HELPERS & MODALS
+        // -------------------------------------------------------------------------
+
+        function openModal(type) {
+            const overlay = document.getElementById('modal-overlay');
+            const container = document.getElementById('modal-container');
+            
+            showElement('modal-overlay');
+            overlay.classList.remove('hidden');
+            overlay.classList.add('flex');
+            
+            setTimeout(() => {
+                container.classList.remove('scale-95', 'opacity-0');
+            }, 10);
+
+            let content = '';
+            switch(type) {
+                case 'create-circle':
+                    content = `
+                        <div class="p-8 text-center">
+                            <div class="w-16 h-16 bg-brand-50 rounded-2xl flex items-center justify-center text-brand-600 text-2xl mx-auto mb-6">
+                                <i class="fa-solid fa-map-location-dot"></i>
+                            </div>
+                            <h3 class="text-2xl font-black text-slate-900 mb-2">Start New Trip</h3>
+                            <p class="text-slate-500 font-medium mb-8">Establish a shared cloud workspace for your adventure.</p>
+                            <input type="text" id="modal-input-name" placeholder="E.g. Goa 2026, EuroTrip" class="input-premium mb-6">
+                            <div class="grid grid-cols-2 gap-4">
+                                <button onclick="closeModal()" class="py-4 bg-slate-100 rounded-2xl font-black text-xs uppercase tracking-widest">Cancel</button>
+                                <button onclick="executeCreateCircle()" class="btn-premium py-4 rounded-2xl text-white font-black text-xs uppercase tracking-widest">Launch Trip</button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'join-circle':
+                    content = `
+                        <div class="p-8 text-center">
+                            <div class="w-16 h-16 bg-brand-50 rounded-2xl flex items-center justify-center text-brand-600 text-2xl mx-auto mb-6">
+                                <i class="fa-solid fa-qrcode"></i>
+                            </div>
+                            <h3 class="text-2xl font-black text-slate-900 mb-2">Join Existing Trip</h3>
+                            <p class="text-slate-500 font-medium mb-8">Enter the unique Workspace ID shared by your team.</p>
+                            <input type="text" id="modal-input-id" placeholder="PRO-XXXXX" class="input-premium mb-6 uppercase">
+                            <div class="grid grid-cols-2 gap-4">
+                                <button onclick="closeModal()" class="py-4 bg-slate-100 rounded-2xl font-black text-xs uppercase tracking-widest">Cancel</button>
+                                <button onclick="executeJoinCircle()" class="btn-premium py-4 rounded-2xl text-white font-black text-xs uppercase tracking-widest">Sync Join</button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+                case 'add-expense':
+                    const members = AppState.circleData.members || [];
+                    content = `
+                        <div class="p-8">
+                            <div class="flex items-center justify-between mb-8">
+                                <h3 class="text-2xl font-black text-slate-900 tracking-tight">Add Expense</h3>
+                                <button onclick="closeModal()" class="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400">
+                                    <i class="fa-solid fa-xmark"></i>
+                                </button>
+                            </div>
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block mb-2">What did you buy?</label>
+                                    <input type="text" id="tx-title" placeholder="Coffee, Uber, Hotel..." class="input-premium">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block mb-2">Total Amount (${AppState.currency})</label>
+                                    <input type="number" id="tx-amount" placeholder="0.00" class="input-premium text-2xl font-black">
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block mb-3">Category</label>
+                                    <div class="grid grid-cols-3 gap-2">
+                                        ${['food', 'transport', 'stay', 'shopping', 'fun', 'other'].map(c => `
+                                            <input type="radio" name="tx-cat" value="${c}" id="cat-${c}" class="hidden cat-radio" ${c==='other'?'checked':''}>
+                                            <label for="cat-${c}" class="border-2 border-slate-100 rounded-xl py-2 flex flex-col items-center gap-1 cursor-pointer transition-all hover:border-brand-300">
+                                                <i class="${getCategoryIcon(c)} text-xs opacity-50"></i>
+                                                <span class="text-[10px] font-black uppercase">${c}</span>
+                                            </label>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                <div>
+                                    <label class="text-[10px] font-black text-slate-400 uppercase tracking-widest ml-1 block mb-4">Split Between Members</label>
+                                    <div class="flex flex-wrap gap-2">
+                                        ${members.map(m => `
+                                            <button onclick="toggleChip(this)" data-name="${m.name}" class="px-4 py-2 rounded-xl text-[10px] font-black uppercase border-2 border-slate-100 transition-all chip-active bg-brand-600 text-white border-brand-600 shadow-md">
+                                                ${m.name}
+                                            </button>
+                                        `).join('')}
+                                    </div>
+                                </div>
+                                <button onclick="handlePublishTx()" class="btn-premium w-full py-5 rounded-2xl text-white font-black shadow-brand-200">Broadcast to Cloud</button>
+                            </div>
+                        </div>
+                    `;
+                    break;
+            }
+            container.innerHTML = content;
+        }
+
+        function closeModal() {
+            const overlay = document.getElementById('modal-overlay');
+            const container = document.getElementById('modal-container');
+            container.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+                overlay.classList.remove('flex');
+            }, 300);
+        }
+
+        async function executeCreateCircle() {
+            const name = document.getElementById('modal-input-name').value.trim();
+            if (!name) return;
+            const id = "PRO-" + Math.random().toString(36).substring(2, 7).toUpperCase();
+            
+            const newTrip = {
+                name,
+                admin: AppState.user.email,
+                members: [{ name: AppState.user.displayName.split(' ')[0], email: AppState.user.email }],
+                createdAt: Date.now(),
+                budget: 10000
+            };
+
+            await db.ref(`groups/${id}`).set(newTrip);
+            closeModal();
+            mountWorkspace(id);
+            showToast(`Trip "${name}" initialized`, "success");
+        }
+
+        async function executeJoinCircle() {
+            const id = document.getElementById('modal-input-id').value.trim().toUpperCase();
+            if (!id) return;
+            
+            const snap = await db.ref(`groups/${id}`).once('value');
+            if (!snap.exists()) {
+                showToast("Invalid Trip Workspace ID", "error");
+                return;
+            }
+
+            const data = snap.val();
+            const members = data.members || [];
+            if (!members.some(m => m.email === AppState.user.email)) {
+                members.push({ name: AppState.user.displayName.split(' ')[0], email: AppState.user.email });
+                await db.ref(`groups/${id}/members`).set(members);
+            }
+
+            closeModal();
+            mountWorkspace(id);
+            showToast("Successfully joined workspace", "success");
+        }
+
+        // Broadcasters
+        function initGlobalBroadcaster() {
+            db.ref('broadcasts').on('value', snap => {
+                const data = snap.val();
+                if (!data) return;
+                
+                showToast(data.text, "info");
+            });
+        }
+
+        // Shared Utility Logic
+        function toggleChip(btn) {
+            const active = btn.classList.contains('chip-active');
+            if (active) {
+                btn.classList.remove('chip-active', 'bg-brand-600', 'text-white', 'border-brand-600', 'shadow-md');
+                btn.classList.add('bg-white', 'text-slate-400', 'border-slate-100');
+            } else {
+                btn.classList.add('chip-active', 'bg-brand-600', 'text-white', 'border-brand-600', 'shadow-md');
+                btn.classList.remove('bg-white', 'text-slate-400', 'border-slate-100');
+            }
+        }
+
+        function getCategoryIcon(cat) {
+            const map = {
+                food: 'fa-solid fa-utensils',
+                transport: 'fa-solid fa-car',
+                stay: 'fa-solid fa-hotel',
+                shopping: 'fa-solid fa-bag-shopping',
+                fun: 'fa-solid fa-martini-glass-citrus',
+                other: 'fa-solid fa-layer-group'
+            };
+            return map[cat] || map.other;
+        }
+
+        function formatCurrency(val) {
+            const conv = AppState.conversionRates[AppState.currency] || 1;
+            const symbol = AppState.currency === 'USD' ? '$' : (AppState.currency === 'EUR' ? '€' : '₹');
+            return symbol + (val * conv).toLocaleString(undefined, { minimumFractionDigits: 0, maximumFractionDigits: 0 });
+        }
+
+        function animateCounter(id, end) {
+            const obj = document.getElementById(id);
+            if (!obj) return;
+            const current = parseFloat(obj.innerText.replace(/[₹$,€]/g, '').replace(/,/g, '')) || 0;
+            const duration = 1000;
+            const start = performance.now();
+
+            function update(timestamp) {
+                const elapsed = timestamp - start;
+                const progress = Math.min(elapsed / duration, 1);
+                const val = current + (end - current) * progress;
+                obj.innerText = formatCurrency(val);
+                if (progress < 1) requestAnimationFrame(update);
+            }
+            requestAnimationFrame(update);
+        }
+
+        function showToast(msg, type = 'success') {
+            const wrapper = document.getElementById('toast-wrapper');
+            const toast = document.createElement('div');
+            const icons = { success: 'fa-circle-check text-success', error: 'fa-circle-xmark text-accent', info: 'fa-circle-info text-brand-500' };
+            
+            toast.className = "toast glass-premium px-6 py-4 rounded-2xl flex items-center gap-4 shadow-2xl border-l-4 " + (type === 'success' ? 'border-success' : (type === 'error' ? 'border-accent' : 'border-brand-500'));
+            toast.innerHTML = `
+                <i class="fa-solid ${icons[type]} text-xl"></i>
+                <div>
+                    <p class="text-slate-900 font-bold text-sm">${msg}</p>
+                </div>
+            `;
+            wrapper.appendChild(toast);
+            setTimeout(() => {
+                toast.style.opacity = '0';
+                toast.style.transform = 'translateY(-20px)';
+                setTimeout(() => toast.remove(), 400);
+            }, 4000);
+        }
+
+        function goBackToDiscovery() {
+            hideElement('app-shell');
+            showElement('auth-screen');
+            showElement('discovery-module');
+        }
+
+        function copyTripID() {
+            navigator.clipboard.writeText(AppState.activeCircleId);
+            showToast("Trip ID copied to clipboard", "info");
+        }
+
+        function signOutUser() {
+            auth.signOut();
+            location.reload();
+        }
+
+        // Element Helpers
+        function showElement(id) { document.getElementById(id)?.classList.remove('hidden'); }
+        function hideElement(id) { document.getElementById(id)?.classList.add('hidden'); }
+
+        // Start Initial Global Timer
+        setTimeout(() => hideElement('global-loader'), 1500);
+
+        /* =============================================================================
+           PREMIUM ADD-ONS: MULTI-CURRENCY & EXPORTS
+           ============================================================================= */
+
+        function changeCurrency(curr) {
+            AppState.currency = curr;
+            document.querySelectorAll('.curr-btn').forEach(btn => {
+                const isActive = btn.getAttribute('data-curr') === curr;
+                btn.classList.toggle('active-curr', isActive);
+                btn.classList.toggle('bg-white', isActive);
+                btn.classList.toggle('shadow-sm', isActive);
+                btn.classList.toggle('text-brand-600', isActive);
+                btn.classList.toggle('text-slate-400', !isActive);
+            });
+            renderActiveWorkspace();
+        }
+
+        async function exportTimelinePDF() {
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            
+            doc.setFontSize(22);
+            doc.text(`TripSplit Audit: ${AppState.circleData.name}`, 20, 20);
+            doc.setFontSize(10);
+            doc.text(`Generated for ${AppState.user.displayName} on ${new Date().toLocaleDateString()}`, 20, 30);
+            
+            let y = 50;
+            const expenses = Object.values(AppState.circleData.expenses || {});
+            expenses.forEach((e, idx) => {
+                doc.text(`${idx + 1}. ${e.title} - ${formatCurrency(e.amount)} (Paid by ${e.by})`, 20, y);
+                y += 10;
+                if (y > 280) { doc.addPage(); y = 20; }
+            });
+            
+            doc.save(`TripSplit_${AppState.activeCircleId}_Audit.pdf`);
+            showToast("Audit PDF generated successfully", "success");
+        }
+
+        // Payment Mocking
+        function triggerUpgradeProcess(tier, price) {
+            AppState.pendingTier = tier;
+            const upi = `upi://pay?pa=${MASTER_UPI}&pn=TripSplitAdmin&am=${price}&cu=INR&tn=TS_Upgrade_${tier}`;
+            document.getElementById('payment-upi-qr').src = `https://api.qrserver.com/v1/create-qr-code/?size=250x250&data=${encodeURIComponent(upi)}`;
+            document.getElementById('payment-amount-display').innerText = formatCurrency(price);
+            showElement('upgrade-payment-module');
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+
+        async function submitUpgradeVerification() {
+            const ref = document.getElementById('payment-ref-id').value.trim();
+            if (!ref) return showToast("Reference ID is required", "error");
+            
+            await db.ref('subscription_requests').push({
+                uid: AppState.user.uid,
+                name: AppState.user.displayName,
+                email: AppState.user.email,
+                tier: AppState.pendingTier,
+                ref,
+                at: new Date().toISOString()
+            });
+            
+            hideElement('upgrade-payment-module');
+            showToast("Request submitted for manual verification", "info");
+        }
+
+        // Initialize App UI States
+        document.addEventListener('DOMContentLoaded', () => {
+            gsap.from("#login-module", { opacity: 0, scale: 0.9, duration: 1, ease: "power4.out" });
+        });
+
+        document.getElementById('google-login-trigger').onclick = () => auth.signInWithPopup(provider);
+
     </script>
 </body>
 </html>
+
