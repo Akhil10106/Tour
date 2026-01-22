@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>AG OS | The Clean Workspace</title>
+    <title>AG OS | Intelligent Workspace</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
@@ -11,13 +11,8 @@
 
     <style>
         :root {
-            --bg-color: #f2f2f7; /* Apple Gray */
-            --card-surface: rgba(255, 255, 255, 0.85);
-            --glass-border: rgba(255, 255, 255, 0.5);
-            --primary: #007AFF; /* System Blue */
-            --shadow-sm: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
-            --shadow-lg: 0 20px 40px -10px rgba(0, 0, 0, 0.1);
-            --shadow-active: 0 10px 25px -5px rgba(0, 122, 255, 0.25);
+            --bg-color: #f2f2f7;
+            --primary: #007AFF;
         }
 
         body {
@@ -26,212 +21,177 @@
             color: #1d1d1f;
             -webkit-font-smoothing: antialiased;
             overflow-x: hidden;
-            background-image: radial-gradient(circle at 50% 0%, #e0e7ff 0%, #f2f2f7 70%);
             min-height: 100vh;
         }
 
-        /* --- THE SUPER SHAPE CARDS (BENTO) --- */
-        .bento-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 24px;
-            padding: 24px;
-            padding-bottom: 120px; /* Space for Dock */
+        /* --- CINEMATIC BACKGROUND --- */
+        #auth-layer {
+            background: linear-gradient(-45deg, #e0e7ff, #f3e8ff, #dbeafe, #f0f9ff);
+            background-size: 400% 400%;
+            animation: aurora 15s ease infinite;
+            position: fixed; inset: 0; z-index: 8000;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        .super-card {
-            background: var(--card-surface);
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: 32px; /* Super rounded shapes */
-            box-shadow: var(--shadow-lg);
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+        @keyframes aurora {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        .auth-grid-overlay {
+            position: absolute; inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 122, 255, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 122, 255, 0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+        }
+
+        /* --- 3D CHARACTER --- */
+        .glass-panel-lg {
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(40px);
+            -webkit-backdrop-filter: blur(40px);
+            border: 1px solid rgba(255, 255, 255, 0.8);
+            border-radius: 48px;
+            padding: 60px 40px;
+            box-shadow: 
+                0 40px 80px -20px rgba(0, 0, 0, 0.1),
+                inset 0 0 0 2px rgba(255, 255, 255, 0.5);
+            width: 100%; max-width: 480px;
+            text-align: center;
+            transform-style: preserve-3d;
+            perspective: 1000px;
+        }
+
+        .robot-head {
+            width: 160px; height: 160px;
+            background: linear-gradient(135deg, #ffffff 0%, #f0f0f0 100%);
+            border-radius: 45px;
+            margin: 0 auto 40px auto;
+            position: relative;
+            box-shadow: 
+                0 20px 50px rgba(0,0,0,0.15),
+                inset 0 -10px 20px rgba(0,0,0,0.05),
+                inset 0 10px 20px rgba(255,255,255,1);
+            transition: transform 0.1s cubic-bezier(0.2, 0.8, 0.2, 1);
+            display: flex; align-items: center; justify-content: center;
+        }
+
+        .visor {
+            width: 120px; height: 80px;
+            background: #1d1d1f;
+            border-radius: 30px;
+            position: relative;
+            display: flex; justify-content: center; align-items: center;
             overflow: hidden;
-            position: relative;
-            cursor: pointer;
-            height: 380px; /* Tall, substantial cards */
-            display: flex;
-            flex-direction: column;
+            box-shadow: inset 0 5px 15px rgba(0,0,0,0.5);
         }
 
-        .super-card:hover {
-            transform: scale(1.02) translateY(-5px);
-            box-shadow: 0 30px 60px -12px rgba(0, 0, 0, 0.15);
-            z-index: 10;
+        .eye-l, .eye-r {
+            width: 24px; height: 24px;
+            background: #007AFF;
+            border-radius: 50%;
+            position: absolute;
+            top: 28px;
+            box-shadow: 0 0 15px #007AFF;
+            transition: height 0.1s;
         }
+        .eye-l { left: 28px; }
+        .eye-r { right: 28px; }
 
-        .super-card:active {
-            transform: scale(0.98);
-        }
-
-        /* Image Area */
-        .card-media {
-            height: 60%;
-            width: 100%;
-            background: #e5e5ea;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .card-media img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            transition: transform 0.6s ease;
-        }
-
-        .super-card:hover .card-media img {
-            transform: scale(1.08);
-        }
-
-        /* Content Area */
-        .card-content {
-            padding: 24px;
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
-
-        /* --- THE FLOATING DOCK (Mac Style) --- */
-        .glass-dock {
-            position: fixed;
-            bottom: 32px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: rgba(255, 255, 255, 0.7);
-            backdrop-filter: blur(25px);
-            -webkit-backdrop-filter: blur(25px);
-            border: 1px solid rgba(255, 255, 255, 0.4);
-            padding: 12px 24px;
-            border-radius: 99px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.2);
-            z-index: 5000;
-            transition: bottom 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        .dock-icon {
-            width: 50px;
-            height: 50px;
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 20px;
-            color: #555;
-            background: rgba(255, 255, 255, 0.5);
-            transition: all 0.3s ease;
-            position: relative;
-        }
-
-        .dock-icon:hover {
-            background: white;
-            transform: translateY(-10px) scale(1.1);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            color: var(--primary);
-        }
-
-        .dock-btn-primary {
-            background: var(--primary);
-            color: white;
-            width: auto;
-            padding: 0 24px;
-            border-radius: 99px;
-            font-weight: 600;
-        }
-        .dock-btn-primary:hover { background: #005ecb; color: white; }
-
-        /* --- THE CLEAN POPUP (Modal) --- */
-        .modal-overlay {
-            position: fixed; inset: 0;
-            background: rgba(0, 0, 0, 0.2);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            z-index: 9999;
-            display: none;
-            align-items: center;
-            justify-content: center;
+        .mouth-line {
+            width: 20px; height: 4px;
+            background: #333;
+            border-radius: 2px;
+            position: absolute;
+            bottom: 20px;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: all 0.3s;
         }
 
-        .clean-modal {
-            width: 90%;
-            max-width: 600px;
-            background: white;
-            border-radius: 40px;
-            box-shadow: 0 50px 100px -20px rgba(0,0,0,0.25);
-            transform: scale(0.9);
-            transition: transform 0.4s cubic-bezier(0.19, 1, 0.22, 1);
-            overflow: hidden;
-            position: relative;
+        .robot-excited .eye-l, .robot-excited .eye-r {
+            height: 12px; 
+            background: #00e0ff;
+            box-shadow: 0 0 20px #00e0ff;
+        }
+        .robot-excited .mouth-line {
+            width: 40px; opacity: 1; background: #00e0ff;
+        }
+        .robot-excited { transform: scale(1.05) !important; }
+
+        .antenna {
+            width: 4px; height: 25px; background: #ccc;
+            position: absolute; top: -20px; left: 50%; transform: translateX(-50%);
+            z-index: -1;
+        }
+        .antenna::after {
+            content: ''; width: 12px; height: 12px; background: #ff3b30;
+            border-radius: 50%; position: absolute; top: -12px; left: -4px;
+            box-shadow: 0 0 10px #ff3b30; animation: blink-light 2s infinite;
         }
 
+        @keyframes blink-light { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        /* --- APP STYLES --- */
+        .bento-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 24px; padding: 24px; padding-bottom: 120px; }
+        .super-card { background: rgba(255,255,255,0.85); backdrop-filter: blur(20px); border: 1px solid rgba(255,255,255,0.5); border-radius: 32px; box-shadow: 0 20px 40px -10px rgba(0,0,0,0.1); transition: all 0.4s; height: 380px; display: flex; flex-direction: column; overflow: hidden; cursor: pointer; }
+        .super-card:hover { transform: scale(1.02) translateY(-5px); box-shadow: 0 30px 60px -12px rgba(0,0,0,0.15); z-index: 10; }
+        .card-media { height: 60%; width: 100%; background: #e5e5ea; position: relative; overflow: hidden; }
+        .card-media img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.6s ease; }
+        .super-card:hover .card-media img { transform: scale(1.08); }
+        .card-content { padding: 24px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        
+        .glass-dock { position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%); background: rgba(255,255,255,0.7); backdrop-filter: blur(25px); padding: 12px 24px; border-radius: 99px; display: flex; gap: 16px; box-shadow: 0 25px 50px -12px rgba(0,0,0,0.2); z-index: 5000; border: 1px solid rgba(255,255,255,0.4); }
+        .dock-icon { width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 20px; color: #555; background: rgba(255,255,255,0.5); transition: all 0.3s; cursor: pointer; }
+        .dock-icon:hover { background: white; transform: translateY(-10px) scale(1.1); color: var(--primary); }
+        .dock-btn-primary { background: var(--primary); color: white; width: auto; padding: 0 24px; border-radius: 99px; font-weight: 600; }
+
+        .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.2); backdrop-filter: blur(10px); z-index: 9999; display: none; align-items: center; justify-content: center; opacity: 0; transition: opacity 0.3s; }
+        .clean-modal { width: 90%; max-width: 600px; background: white; border-radius: 40px; box-shadow: 0 50px 100px -20px rgba(0,0,0,0.25); transform: scale(0.9); transition: transform 0.4s; overflow: hidden; position: relative; }
         .modal-open .modal-overlay { display: flex; opacity: 1; }
         .modal-open .clean-modal { transform: scale(1); }
-
-        /* Inputs */
-        .clean-input {
-            width: 100%;
-            background: #f2f2f7;
-            border: none;
-            padding: 18px 24px;
-            border-radius: 18px;
-            font-size: 16px;
-            font-weight: 500;
-            margin-bottom: 16px;
-            outline: none;
-            transition: all 0.2s;
-        }
-        .clean-input:focus {
-            background: white;
-            box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15);
-        }
-
-        /* Animations */
-        @keyframes floatIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
-        .animate-in { animation: floatIn 0.6s ease forwards; }
-
-        /* Toast */
-        .toast {
-            position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-100px);
-            background: rgba(255, 255, 255, 0.9); backdrop-filter: blur(12px);
-            padding: 12px 24px; border-radius: 99px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
-            display: flex; align-items: center; gap: 10px;
-            z-index: 10000; transition: transform 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
+        
+        .clean-input { width: 100%; background: #f2f2f7; border: none; padding: 18px 24px; border-radius: 18px; font-size: 16px; font-weight: 500; margin-bottom: 16px; outline: none; transition: 0.2s; }
+        .clean-input:focus { background: white; box-shadow: 0 0 0 4px rgba(0, 122, 255, 0.15); }
+        .toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%) translateY(-100px); background: rgba(255,255,255,0.9); backdrop-filter: blur(12px); padding: 12px 24px; border-radius: 99px; box-shadow: 0 10px 30px rgba(0,0,0,0.1); display: flex; align-items: center; gap: 10px; z-index: 10000; transition: transform 0.5s; }
         .toast-active { transform: translateX(-50%) translateY(0); }
-
     </style>
 </head>
-<body class="modal-closed">
+<body class="modal-closed" onmousemove="handleMouseMove(event)">
 
     <div id="toast-pill" class="toast">
         <div class="w-2 h-2 rounded-full bg-green-500"></div>
         <span id="toast-msg" class="text-sm font-semibold text-gray-700">System Ready</span>
     </div>
 
-    <div id="auth-layer" class="fixed inset-0 z-[8000] bg-[#f2f2f7] flex items-center justify-center p-6">
-        <div class="bg-white p-10 rounded-[40px] shadow-2xl text-center max-w-sm w-full animate-in">
-            <div class="w-20 h-20 bg-black text-white rounded-[24px] mx-auto mb-6 flex items-center justify-center text-3xl shadow-lg">
-                <i class="fa-brands fa-apple"></i>
+    <div id="auth-layer">
+        <div class="auth-grid-overlay"></div>
+        <div class="glass-panel-lg">
+            <div class="robot-head" id="robot">
+                <div class="antenna"></div>
+                <div class="visor">
+                    <div class="eye-l" id="eye-l"></div>
+                    <div class="eye-r" id="eye-r"></div>
+                    <div class="mouth-line"></div>
+                </div>
             </div>
-            <h1 class="text-3xl font-bold tracking-tight text-gray-900 mb-2">AG OS</h1>
-            <p class="text-gray-500 font-medium mb-8">Secure Workspace Environment</p>
-            <button id="login-btn" class="w-full py-4 bg-[#007AFF] text-white rounded-2xl font-bold text-lg hover:bg-blue-600 transition-all shadow-lg shadow-blue-200">
-                Enter System
+            <h1 class="text-4xl font-black tracking-tight text-gray-900 mb-2">AG OS <span class="text-[#007AFF]">ULTRA</span></h1>
+            <p class="text-gray-500 font-medium mb-10 text-lg">Identity Verification Required</p>
+            <button id="login-btn" class="w-full py-5 bg-[#007AFF] text-white rounded-3xl font-bold text-xl hover:bg-blue-600 transition-all shadow-xl shadow-blue-200/50 flex items-center justify-center gap-3 group relative overflow-hidden" 
+                onmouseenter="setRobotExcited(true)" 
+                onmouseleave="setRobotExcited(false)">
+                <span class="relative z-10">Access Workspace</span>
+                <i class="fa-solid fa-arrow-right relative z-10 group-hover:translate-x-1 transition-transform"></i>
             </button>
+            <p class="mt-8 text-xs font-bold text-gray-400 uppercase tracking-widest">Secured by AG Systems</p>
         </div>
     </div>
 
     <div id="app-layer" class="hidden">
         
-        <header class="px-8 py-8 flex justify-between items-end max-w-7xl mx-auto animate-in">
+        <header class="px-8 py-8 flex justify-between items-end max-w-7xl mx-auto">
             <div>
                 <p class="text-sm font-bold text-gray-400 uppercase tracking-widest mb-1">My Workspace</p>
                 <h1 class="text-4xl font-extrabold text-gray-900 tracking-tight">Project <span class="text-[#007AFF]">Farm</span></h1>
@@ -242,31 +202,31 @@
             </div>
         </header>
 
-        <main id="bento-container" class="bento-grid max-w-7xl mx-auto">
-            </main>
+        <main id="bento-container" class="bento-grid max-w-7xl mx-auto"></main>
 
         <nav class="glass-dock">
             <button onclick="filterGrid('all')" class="dock-icon" title="All Projects"><i class="fa-solid fa-grid-2"></i></button>
-            <button onclick="window.scrollTo({top:0, behavior:'smooth'})" class="dock-icon" title="Top"><i class="fa-solid fa-arrow-up"></i></button>
-            <div class="w-px h-8 bg-gray-300 mx-2"></div> <button onclick="openCreateModal()" class="dock-icon dock-btn-primary">
+            <div class="w-px h-8 bg-gray-300 mx-2"></div>
+            
+            <button id="create-btn" onclick="openCreateModal()" class="dock-icon dock-btn-primary hidden">
                 <i class="fa-solid fa-plus mr-2"></i> Create
             </button>
-            <div class="w-px h-8 bg-gray-300 mx-2"></div>
-            <button onclick="location.reload()" class="dock-icon text-red-500 hover:bg-red-50" title="Logout"><i class="fa-solid fa-power-off"></i></button>
+            <div id="create-divider" class="w-px h-8 bg-gray-300 mx-2 hidden"></div>
+            
+            <button onclick="handleLogout()" class="dock-icon text-red-500 hover:bg-red-50" title="Logout"><i class="fa-solid fa-power-off"></i></button>
         </nav>
 
         <div id="create-modal" class="modal-overlay">
             <div class="clean-modal p-8">
                 <div class="flex justify-between items-center mb-8">
-                    <h2 class="text-2xl font-bold text-gray-900">New Project Node</h2>
+                    <h2 id="modal-title" class="text-2xl font-bold text-gray-900">New Project Node</h2>
                     <button onclick="closeModals()" class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 hover:bg-gray-200 flex items-center justify-center transition"><i class="fa-solid fa-xmark"></i></button>
                 </div>
-                
                 <div class="space-y-2">
+                    <input type="hidden" id="in-id"> 
                     <input type="text" id="in-title" placeholder="Project Name" class="clean-input">
                     <input type="url" id="in-link" placeholder="Website Link (https://...)" class="clean-input">
                     <textarea id="in-desc" placeholder="What is this project about?" class="clean-input h-32 resize-none"></textarea>
-                    
                     <button onclick="submitProject()" id="submit-btn" class="w-full py-4 bg-[#007AFF] text-white rounded-2xl font-bold text-lg hover:scale-[1.02] active:scale-95 transition-all shadow-xl shadow-blue-100 mt-4">
                         Launch Project
                     </button>
@@ -279,15 +239,15 @@
                 <div class="h-64 bg-gray-200 relative">
                     <img id="detail-img" class="w-full h-full object-cover">
                     <button onclick="closeModals()" class="absolute top-4 right-4 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md text-black flex items-center justify-center shadow-lg hover:scale-110 transition"><i class="fa-solid fa-xmark"></i></button>
+                    <button id="detail-edit" class="absolute top-4 left-4 w-10 h-10 rounded-full bg-white/80 backdrop-blur-md text-blue-600 flex items-center justify-center shadow-lg hover:scale-110 transition hidden"><i class="fa-solid fa-pen"></i></button>
                 </div>
                 <div class="p-8">
                     <div class="flex gap-2 mb-4">
                         <span class="px-3 py-1 bg-blue-50 text-blue-600 rounded-full text-xs font-bold uppercase tracking-wide">Production</span>
                         <span class="px-3 py-1 bg-gray-100 text-gray-500 rounded-full text-xs font-bold uppercase tracking-wide" id="detail-date">Date</span>
                     </div>
-                    <h2 id="detail-title" class="text-3xl font-extrabold text-gray-900 mb-4 leading-tight">Project Title</h2>
-                    <p id="detail-desc" class="text-gray-600 font-medium leading-relaxed mb-8">Description goes here...</p>
-                    
+                    <h2 id="detail-title" class="text-3xl font-extrabold text-gray-900 mb-4 leading-tight"></h2>
+                    <p id="detail-desc" class="text-gray-600 font-medium leading-relaxed mb-8"></p>
                     <div class="flex gap-4">
                         <a id="detail-link" href="#" target="_blank" class="flex-1 py-4 bg-black text-white rounded-2xl font-bold text-center hover:bg-gray-800 transition shadow-lg">
                             Visit Site <i class="fa-solid fa-arrow-up-right-from-square ml-2"></i>
@@ -305,178 +265,141 @@
     <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
 
     <script>
-        // CONFIG
-        const firebaseConfig = {
-            apiKey: "AIzaSyCy5NOv_bRx8Ozbq3n5MzXz8D7cF1Piwko",
-            authDomain: "services-6ce70.firebaseapp.com",
-            databaseURL: "https://services-6ce70-default-rtdb.firebaseio.com",
-            projectId: "services-6ce70",
-            storageBucket: "services-6ce70.firebasestorage.app"
-        };
+        const firebaseConfig = { apiKey: "AIzaSyCy5NOv_bRx8Ozbq3n5MzXz8D7cF1Piwko", authDomain: "services-6ce70.firebaseapp.com", databaseURL: "https://services-6ce70-default-rtdb.firebaseio.com", projectId: "services-6ce70", storageBucket: "services-6ce70.firebasestorage.app" };
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
         const auth = firebase.auth();
         const provider = new firebase.auth.GoogleAuthProvider();
+        provider.setCustomParameters({ prompt: 'select_account' });
         
         const ADMIN_EMAIL = "akhilgoel985@gmail.com";
         let currentUser = null;
 
-        // AUTH
+        // --- 3D ROBOT LOGIC ---
+        function handleMouseMove(e) {
+            const eyes = [document.getElementById('eye-l'), document.getElementById('eye-r')];
+            eyes.forEach(eye => {
+                const x = (e.clientX / window.innerWidth) * 16 - 8;
+                const y = (e.clientY / window.innerHeight) * 16 - 8;
+                if(eye) eye.style.transform = `translate(${x}px, ${y}px)`;
+            });
+            const head = document.getElementById('robot');
+            if(head) {
+                const rotX = (e.clientY / window.innerHeight) * 20 - 10;
+                const rotY = (e.clientX / window.innerWidth) * 20 - 10;
+                head.style.transform = `rotateX(${-rotX}deg) rotateY(${rotY}deg)`;
+            }
+        }
+        function setRobotExcited(active) {
+            const head = document.getElementById('robot');
+            if(active) head.classList.add('robot-excited');
+            else head.classList.remove('robot-excited');
+        }
+
+        // --- AUTH ---
         document.getElementById('login-btn').onclick = () => auth.signInWithPopup(provider);
-        
+        function handleLogout() { auth.signOut().then(() => window.location.reload()); }
+
         auth.onAuthStateChanged(user => {
             if (user) {
                 currentUser = user;
-                document.getElementById('auth-layer').style.display = 'none';
-                document.getElementById('app-layer').classList.remove('hidden');
+                const authLayer = document.getElementById('auth-layer');
+                authLayer.style.opacity = '0';
+                authLayer.style.transition = 'opacity 0.5s';
+                setTimeout(() => {
+                    authLayer.style.display = 'none';
+                    document.getElementById('app-layer').classList.remove('hidden');
+                }, 500);
+
                 document.getElementById('user-img').src = user.photoURL;
                 document.getElementById('user-name').innerText = user.displayName.split(' ')[0];
+                
+                // --- DEBUG FIX: HIDE CREATE BUTTON FOR NON-ADMINS ---
+                if (user.email.toLowerCase() === ADMIN_EMAIL) {
+                    document.getElementById('create-btn').classList.remove('hidden');
+                    document.getElementById('create-divider').classList.remove('hidden');
+                } else {
+                    document.getElementById('create-btn').classList.add('hidden');
+                    document.getElementById('create-divider').classList.add('hidden');
+                }
+
                 loadProjects();
-                showToast(`Welcome back, ${user.displayName.split(' ')[0]}`);
+                showToast(`Welcome, ${user.displayName.split(' ')[0]}`);
+            } else {
+                document.getElementById('auth-layer').style.display = 'flex';
+                document.getElementById('app-layer').classList.add('hidden');
             }
         });
 
-        // DATA LOADING (The Farm)
+        // --- APP LOGIC ---
         function loadProjects() {
             const container = document.getElementById('bento-container');
-            
             db.ref('agency_vault').on('value', snap => {
                 container.innerHTML = '';
-                
                 if (!snap.exists()) {
-                    container.innerHTML = `
-                        <div class="col-span-full flex flex-col items-center justify-center py-20 opacity-40">
-                            <i class="fa-regular fa-folder-open text-6xl mb-4"></i>
-                            <h3 class="text-xl font-bold">Workspace Empty</h3>
-                            <p>Tap "Create" to start building.</p>
-                        </div>`;
+                    container.innerHTML = `<div class="col-span-full flex flex-col items-center justify-center py-20 opacity-40"><i class="fa-regular fa-folder-open text-6xl mb-4"></i><h3 class="text-xl font-bold">Workspace Empty</h3></div>`;
                     return;
                 }
-
                 snap.forEach(child => {
                     const data = child.val();
                     const card = document.createElement('div');
                     card.className = "super-card animate-in";
-                    card.onclick = () => openDetail(data, child.key); // CLICK ANYWHERE TO OPEN
-                    
-                    // Fallback image if fetch fails
-                    const imgUrl = data.image && data.image.includes('http') ? data.image : 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800';
-
-                    card.innerHTML = `
-                        <div class="card-media">
-                            <img src="${imgUrl}" alt="${data.name}" loading="lazy">
-                            <div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">
-                                Live Node
-                            </div>
-                        </div>
-                        <div class="card-content">
-                            <div>
-                                <h3 class="text-xl font-bold text-gray-900 leading-tight mb-2">${data.name}</h3>
-                                <p class="text-sm text-gray-500 font-medium line-clamp-2">${data.desc}</p>
-                            </div>
-                            <div class="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100">
-                                <div class="w-6 h-6 rounded-full bg-gray-200 overflow-hidden">
-                                    <img src="https://ui-avatars.com/api/?name=${data.author}&background=random" class="w-full h-full">
-                                </div>
-                                <span class="text-xs font-bold text-gray-400 uppercase">${data.author}</span>
-                            </div>
-                        </div>
-                    `;
+                    card.onclick = () => openDetail(data, child.key);
+                    const imgUrl = data.image || 'https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=800';
+                    card.innerHTML = `<div class="card-media"><img src="${imgUrl}"><div class="absolute top-4 right-4 bg-white/90 backdrop-blur px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider shadow-sm">Live Node</div></div><div class="card-content"><div><h3 class="text-xl font-bold text-gray-900 leading-tight mb-2">${data.name}</h3><p class="text-sm text-gray-500 font-medium line-clamp-2">${data.desc}</p></div><div class="flex items-center gap-2 mt-4 pt-4 border-t border-gray-100"><div class="w-6 h-6 rounded-full bg-gray-200 overflow-hidden"><img src="https://ui-avatars.com/api/?name=${data.author}&background=random" class="w-full h-full"></div><span class="text-xs font-bold text-gray-400 uppercase">${data.author}</span></div></div>`;
                     container.appendChild(card);
                 });
             });
         }
 
-        // MODAL LOGIC
-        function openCreateModal() {
+        function openCreateModal(isEdit = false, data = null, key = null) {
             document.body.classList.add('modal-open');
-            document.getElementById('create-modal').style.display = 'flex';
-            setTimeout(() => document.getElementById('create-modal').style.opacity = '1', 10);
+            const modal = document.getElementById('create-modal');
+            const title = document.getElementById('modal-title');
+            const btn = document.getElementById('submit-btn');
+            
+            if (isEdit && data) {
+                title.innerText = "Edit Project Node"; btn.innerText = "Save Changes";
+                document.getElementById('in-id').value = key; document.getElementById('in-title').value = data.name; document.getElementById('in-link').value = data.link; document.getElementById('in-desc').value = data.desc;
+                btn.onclick = () => submitProject(true);
+            } else {
+                title.innerText = "New Project Node"; btn.innerText = "Launch Project";
+                document.getElementById('in-id').value = ''; document.getElementById('in-title').value = ''; document.getElementById('in-link').value = ''; document.getElementById('in-desc').value = '';
+                btn.onclick = () => submitProject(false);
+            }
+            modal.style.display = 'flex'; setTimeout(() => modal.style.opacity = '1', 10);
         }
 
         function openDetail(data, key) {
             document.body.classList.add('modal-open');
             const modal = document.getElementById('detail-modal');
+            document.getElementById('detail-title').innerText = data.name; document.getElementById('detail-desc').innerText = data.desc; document.getElementById('detail-img').src = data.image; document.getElementById('detail-link').href = data.link; document.getElementById('detail-date').innerText = new Date(data.timestamp).toLocaleDateString();
             
-            document.getElementById('detail-title').innerText = data.name;
-            document.getElementById('detail-desc').innerText = data.desc;
-            document.getElementById('detail-img').src = data.image;
-            document.getElementById('detail-link').href = data.link;
-            document.getElementById('detail-date').innerText = new Date(data.timestamp).toLocaleDateString();
-            
-            // Delete Logic (Only Admin or Owner)
             const delBtn = document.getElementById('detail-delete');
+            const editBtn = document.getElementById('detail-edit');
             if (currentUser.email.toLowerCase() === ADMIN_EMAIL || data.author === currentUser.displayName) {
-                delBtn.style.display = 'block';
-                delBtn.onclick = (e) => {
-                    e.stopPropagation(); // Prevent bubbling
-                    if(confirm('Delete this project node?')) {
-                        db.ref(`agency_vault/${key}`).remove();
-                        closeModals();
-                        showToast('Project Deleted', 'red');
-                    }
-                };
-            } else {
-                delBtn.style.display = 'none';
-            }
-
-            modal.style.display = 'flex';
-            setTimeout(() => modal.style.opacity = '1', 10);
+                delBtn.style.display = 'block'; editBtn.classList.remove('hidden');
+                delBtn.onclick = (e) => { e.stopPropagation(); if(confirm('Delete?')) { db.ref(`agency_vault/${key}`).remove(); closeModals(); showToast('Deleted', 'red'); }};
+                editBtn.onclick = () => { closeModals(); setTimeout(() => openCreateModal(true, data, key), 300); };
+            } else { delBtn.style.display = 'none'; editBtn.classList.add('hidden'); }
+            modal.style.display = 'flex'; setTimeout(() => modal.style.opacity = '1', 10);
         }
 
         function closeModals() {
-            document.body.classList.remove('modal-open');
-            document.querySelectorAll('.modal-overlay').forEach(m => m.style.opacity = '0');
-            setTimeout(() => document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'), 300);
+            document.body.classList.remove('modal-open'); document.querySelectorAll('.modal-overlay').forEach(m => m.style.opacity = '0'); setTimeout(() => document.querySelectorAll('.modal-overlay').forEach(m => m.style.display = 'none'), 300);
         }
 
-        // SUBMISSION LOGIC
-        async function submitProject() {
-            const title = document.getElementById('in-title').value;
-            const link = document.getElementById('in-link').value;
-            const desc = document.getElementById('in-desc').value;
-            const btn = document.getElementById('submit-btn');
-
-            if(!title || !link) return showToast("Please fill all details", 'red');
-
-            btn.disabled = true;
-            btn.innerText = "Processing...";
-
-            // Microlink for High-Res Screenshot
-            const screenshot = `https://api.microlink.io?url=${encodeURIComponent(link)}&screenshot=true&embed=screenshot.url`;
-
-            await db.ref('agency_vault').push({
-                name: title,
-                link: link,
-                desc: desc,
-                image: screenshot,
-                author: currentUser.displayName,
-                timestamp: Date.now()
-            });
-
-            showToast("Project Launched");
-            closeModals();
-            btn.disabled = false;
-            btn.innerText = "Launch Project";
-            
-            // Clear inputs
-            document.getElementById('in-title').value = '';
-            document.getElementById('in-link').value = '';
-            document.getElementById('in-desc').value = '';
+        async function submitProject(isEdit) {
+            const id = document.getElementById('in-id').value; const title = document.getElementById('in-title').value; const link = document.getElementById('in-link').value; const desc = document.getElementById('in-desc').value; const btn = document.getElementById('submit-btn');
+            if(!title || !link) return showToast("Fill all fields", 'red');
+            btn.disabled = true; btn.innerText = isEdit ? "Updating..." : "Processing...";
+            let updateData = { name: title, link: link, desc: desc, timestamp: Date.now() };
+            if (!isEdit) { updateData.image = `https://api.microlink.io?url=${encodeURIComponent(link)}&screenshot=true&embed=screenshot.url`; updateData.author = currentUser.displayName; await db.ref('agency_vault').push(updateData); showToast("Launched"); }
+            else { await db.ref(`agency_vault/${id}`).update(updateData); showToast("Updated"); }
+            closeModals(); btn.disabled = false;
         }
 
-        // UTILS
-        function showToast(msg, color = 'green') {
-            const pill = document.getElementById('toast-pill');
-            const msgEl = document.getElementById('toast-msg');
-            const dot = pill.querySelector('div');
-            
-            msgEl.innerText = msg;
-            dot.className = `w-2 h-2 rounded-full bg-${color}-500`;
-            pill.classList.add('toast-active');
-            
-            setTimeout(() => pill.classList.remove('toast-active'), 3000);
-        }
+        function showToast(msg, color = 'green') { const pill = document.getElementById('toast-pill'); document.getElementById('toast-msg').innerText = msg; pill.querySelector('div').className = `w-2 h-2 rounded-full bg-${color}-500`; pill.classList.add('toast-active'); setTimeout(() => pill.classList.remove('toast-active'), 3000); }
     </script>
 </body>
 </html>
